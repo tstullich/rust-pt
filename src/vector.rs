@@ -1,4 +1,4 @@
-use std::ops;
+use std::{cmp, ops};
 
 #[derive(Debug)]
 pub struct Vec3 {
@@ -40,6 +40,12 @@ impl ops::Div<f32> for Vec3 {
             panic!("Denominator is 0!");
         }
         Vec3 { x: self.x / scalar, y: self.y / scalar, z: self.z / scalar }
+    }
+}
+
+impl cmp::PartialEq for Vec3 {
+    fn eq(&self, other: &Vec3) -> bool {
+        self.x == other.x && self.y == other.y && self.z == other.z
     }
 }
 
