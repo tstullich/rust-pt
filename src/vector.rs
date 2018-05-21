@@ -15,6 +15,34 @@ impl ops::Add for Vec3 {
     }
 }
 
+/**
+ * Function to divide one vector with another
+ */
+impl ops::Div<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn div(self, other: Vec3) -> Vec3 {
+        if other.x == 0.0 || other.y == 0.0 || other.z == 0.0 {
+            panic!("Denominator is 0!");
+        }
+        Vec3 { x: self.x / other.x, y: self.y / other.y, z: self.z / other.z }
+    }
+}
+
+/**
+ * Function to divide a vector with a scalar
+ */
+impl ops::Div<f32> for Vec3 {
+    type Output = Vec3;
+
+    fn div(self, scalar: f32) -> Vec3 {
+        if scalar == 0.0 {
+            panic!("Denominator is 0!");
+        }
+        Vec3 { x: self.x / scalar, y: self.y / scalar, z: self.z / scalar }
+    }
+}
+
 impl ops::Sub for Vec3 {
     type Output = Vec3;
 
@@ -23,7 +51,10 @@ impl ops::Sub for Vec3 {
     }
 }
 
-impl ops::Mul for Vec3 {
+/**
+ * Implements the dot product of two vectors
+ */
+impl ops::Mul<Vec3> for Vec3 {
     type Output = Vec3;
 
     fn mul(self, other: Vec3) -> Vec3 {
@@ -31,6 +62,21 @@ impl ops::Mul for Vec3 {
     }
 }
 
+/**
+ * Implements scalar multiplication
+ */
+impl ops::Mul<f32> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, scalar: f32) -> Vec3 {
+        Vec3 { x: self.x * scalar, y: self.y * scalar, z: self.z * scalar }
+    }
+}
+
+/**
+ * Some of the functions below are mutable and therefore modify the
+ * calling class.
+ */
 impl Vec3 {
     pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
         Vec3 { x, y, z }
@@ -66,10 +112,10 @@ impl Vec3 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
-    pub fn multiply_scalar(&mut self, scalar: i32) {
-        self.x *= scalar as f32;
-        self.y *= scalar as f32;
-        self.z *= scalar as f32;
+    pub fn multiply_scalar(&mut self, scalar: f32) {
+        self.x *= scalar;
+        self.y *= scalar;
+        self.z *= scalar;
     }
 
     pub fn normalize(&self) -> Vec3 {
@@ -87,5 +133,9 @@ impl Vec3 {
         self.x -= scalar as f32;
         self.y -= scalar as f32;
         self.z -= scalar as f32;
+    }
+
+    pub fn unit(self, b: Vec3) -> Vec3 {
+        self / b.length()
     }
 }
