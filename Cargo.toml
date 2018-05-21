@@ -1,0 +1,7 @@
+[package]
+name = "raytracer"
+version = "0.1.0"
+authors = ["Tim Stullich <tstullich@protonmail.com>"]
+
+[dependencies]
+image = "*"
