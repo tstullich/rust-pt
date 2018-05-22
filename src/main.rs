@@ -24,8 +24,11 @@ fn main() {
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         let u = x as f32 / img_x as f32;
         let v = y as f32 / img_y as f32;
-        let ray = ray::Ray::new(origin, lower_left_corner + (horizontal * u)
-                                + (vertical * v));
+
+        // Flipping direction vector since we start our trace in the bottom
+        // left but the enumeration of the picture begins in top right
+        let direction = (lower_left_corner + (horizontal * u) + (vertical * v)) * -1.0;
+        let ray = ray::Ray::new(origin, direction);
 
         let color = color(ray);
         let ir = (255.99 * color.x()) as u8;
