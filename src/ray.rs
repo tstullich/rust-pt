@@ -1,27 +1,27 @@
 use vector::Vec3;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Ray {
-    a: Vec3,
-    b: Vec3,
+    origin: Vec3,
+    direction: Vec3,
 }
 
 impl Ray {
     // TODO Think about making a copy of a and b instead of moving
     pub fn new(a: Vec3, b: Vec3) -> Ray {
-        Ray { a, b }
+        Ray { origin: a, direction: b }
     }
 
     pub fn origin(self) -> Vec3 {
-        self.a
+        self.origin
     }
 
     pub fn direction(self) -> Vec3 {
-        self.b
+        self.direction
     }
 
     pub fn point_at_t(self, t: f32) -> Vec3 {
-        self.a + (self.b * t)
+        self.origin + (self.direction * t)
     }
 }
 

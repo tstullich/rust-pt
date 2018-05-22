@@ -1,6 +1,6 @@
 use std::{cmp, ops};
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vec3 {
     x: f32,
     y: f32,
@@ -70,6 +70,8 @@ impl ops::Mul<Vec3> for Vec3 {
 
 /**
  * Implements scalar multiplication
+ * TODO Make this a binary operator so
+ * we can do <scalar> * <Vec3> or <Vec3> * <scalar>
  */
 impl ops::Mul<f32> for Vec3 {
     type Output = Vec3;
@@ -113,7 +115,7 @@ impl Vec3 {
         (self.x * b.x) + (self.y * b.y) + (self.z * b.z)
     }
 
-    // Calculates the Euclidean length from (0, 0, 0)
+    // Calculates the Euclidean length
     pub fn length(&self) -> f32 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
@@ -141,7 +143,19 @@ impl Vec3 {
         self.z -= scalar as f32;
     }
 
-    pub fn unit(self, b: Vec3) -> Vec3 {
-        self / b.length()
+    pub fn unit_vec(self) -> Vec3 {
+        self / self.length()
+    }
+
+    pub fn x(self) -> f32 {
+        self.x
+    }
+
+    pub fn y(self) -> f32 {
+        self.y
+    }
+
+    pub fn z(self) -> f32 {
+        self.z
     }
 }
