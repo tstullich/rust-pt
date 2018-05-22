@@ -1,11 +1,21 @@
 extern crate image;
 
+mod hitable;
 mod ray;
+mod sphere;
 mod vector;
 
 use std::path::Path;
 
-fn color(r: ray::Ray) -> vector::Vec3 {
+fn color(r: &ray::Ray) -> vector::Vec3 {
+    let t = hit_sphere(&vector::Vec3::new(0.0, 0.0, -1.0), 0.5, r);
+    if t > 0.0 {
+        let normal = (r.point_at_t(t) - vector::Vec3::new(0.0, 0.0, -1.0)).unit_vec();
+        return vector::Vec3::new(normal.x() + 1.0,
+                                 normal.y() + 1.0,
+                                 normal.z() + 1.0) * 0.5
+    }
+
     let unit_direction = r.direction().unit_vec();
     let t = 0.5 * (unit_direction.y() + 1.0);
     vector::Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) +
@@ -18,19 +28,17 @@ fn main() {
     let vertical = vector::Vec3::new(0.0, 2.0, 0.0);
     let origin = vector::Vec3::new(0.0, 0.0, 0.0);
 
-    let img_x = 200;
-    let img_y = 100;
+    let img_x = 2000;
+    let img_y = 1000;
     let mut imgbuf = image::ImageBuffer::new(img_x, img_y);
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         let u = x as f32 / img_x as f32;
         let v = y as f32 / img_y as f32;
 
-        // Flipping direction vector since we start our trace in the bottom
-        // left but the enumeration of the picture begins in top right
-        let direction = (lower_left_corner + (horizontal * u) + (vertical * v)) * -1.0;
+        let direction = lower_left_corner + horizontal * u + vertical * v;
         let ray = ray::Ray::new(origin, direction);
 
-        let color = color(ray);
+        let color = color(&ray);
         let ir = (255.99 * color.x()) as u8;
         let ig = (255.99 * color.y()) as u8;
         let ib = (255.99 * color.z()) as u8;
