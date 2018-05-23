@@ -2,9 +2,9 @@ use hitable::{Hitable, HitRecord};
 use ray::Ray;
 use vector::Vec3;
 
-struct Sphere {
-    center: Vec3,
-    radius: f32,
+pub struct Sphere {
+    pub center: Vec3,
+    pub radius: f32,
 }
 
 impl Hitable for Sphere {
@@ -36,7 +36,7 @@ impl Hitable for Sphere {
 }
 
 impl Sphere {
-    fn new(center: Vec3, radius: f32) -> Sphere {
+    pub fn new(center: Vec3, radius: f32) -> Sphere {
         Sphere {center, radius}
     }
 }

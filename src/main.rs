@@ -1,24 +1,24 @@
 extern crate image;
 
 mod hitable;
+mod hitable_list;
 mod ray;
 mod sphere;
 mod vector;
 
-use std::path::Path;
+use hitable::Hitable;
 
-fn color(r: &ray::Ray) -> vector::Vec3 {
-    let t = hit_sphere(&vector::Vec3::new(0.0, 0.0, -1.0), 0.5, r);
-    if t > 0.0 {
-        let normal = (r.point_at_t(t) - vector::Vec3::new(0.0, 0.0, -1.0)).unit_vec();
-        return vector::Vec3::new(normal.x() + 1.0,
-                                 normal.y() + 1.0,
-                                 normal.z() + 1.0) * 0.5
+fn color(r: &ray::Ray, world: hitable_list::HitableList) -> vector::Vec3 {
+    let mut rec: hitable::HitRecord = hitable::HitRecord::new();
+    if world.hit(r, 0.0, std::f32::MAX, &mut rec) {
+        return vector::Vec3::new(rec.normal.x() + 1.0,
+                                 rec.normal.y() + 1.0,
+                                 rec.normal.z() + 1.0) * 0.5
     }
 
     let unit_direction = r.direction().unit_vec();
-    let t = 0.5 * (unit_direction.y() + 1.0);
-    vector::Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) +
+    let t: f32 = (unit_direction.y() + 1.0) * 0.5;
+    return vector::Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) +
         vector::Vec3::new(0.5, 0.7, 1.0) * t
 }
 
@@ -27,6 +27,8 @@ fn main() {
     let horizontal = vector::Vec3::new(4.0, 0.0, 0.0);
     let vertical = vector::Vec3::new(0.0, 2.0, 0.0);
     let origin = vector::Vec3::new(0.0, 0.0, 0.0);
+
+    let world = hitable_list::HitableList::new();
 
     let img_x = 2000;
     let img_y = 1000;
@@ -38,7 +40,9 @@ fn main() {
         let direction = lower_left_corner + horizontal * u + vertical * v;
         let ray = ray::Ray::new(origin, direction);
 
-        let color = color(&ray);
+        let p = ray.point_at_t(2.0);
+
+        let color = color(&ray, world);
         let ir = (255.99 * color.x()) as u8;
         let ig = (255.99 * color.y()) as u8;
         let ib = (255.99 * color.z()) as u8;
@@ -46,6 +50,6 @@ fn main() {
         *pixel = image::Rgb([ir, ig, ib]);
     }
 
-    let path = Path::new("test.png");
+    let path = std::path::Path::new("test.png");
     image::ImageRgb8(imgbuf).save(path).unwrap();
 }
