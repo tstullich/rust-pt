@@ -1,10 +1,14 @@
 extern crate image;
+extern crate rand;
 
+mod camera;
 mod hitable;
 mod hitable_list;
 mod ray;
 mod sphere;
 mod vector;
+
+use rand::{thread_rng, Rng};
 
 fn color(r: &ray::Ray, world: &hitable_list::HitableList) -> vector::Vec3 {
     let mut rec: hitable::HitRecord = hitable::HitRecord::new();
@@ -21,31 +25,32 @@ fn color(r: &ray::Ray, world: &hitable_list::HitableList) -> vector::Vec3 {
 }
 
 fn main() {
-    let lower_left_corner = vector::Vec3::new(-2.0, -1.0, -1.0);
-    let horizontal = vector::Vec3::new(4.0, 0.0, 0.0);
-    let vertical = vector::Vec3::new(0.0, 2.0, 0.0);
-    let origin = vector::Vec3::new(0.0, 0.0, 0.0);
-
     let mut world = hitable_list::HitableList::new();
     world.add(Box::new(sphere::Sphere::new(vector::Vec3::new(0.0, 0.0, -1.0), 0.5)));
     world.add(Box::new(sphere::Sphere::new(vector::Vec3::new(0.0, -100.5, -1.0), 100.0)));
 
-    let img_x = 2000;
-    let img_y = 1000;
-    let mut imgbuf = image::ImageBuffer::new(img_x, img_y);
+    let cam = camera::Camera::new();
+    let num_samples = 4;
+    let mut rng = thread_rng();
+    let dim_x = 2000;
+    let dim_y = 1000;
+    let mut imgbuf = image::ImageBuffer::new(dim_x, dim_y);
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let u = x as f32 / img_x as f32;
-        let v = y as f32 / img_y as f32;
+        let mut col = vector::Vec3::new(0.0, 0.0, 0.0);
+        for _ in 0..num_samples {
+            let r_x: f32 = rng.gen_range(0.0, 1.0);
+            let r_y: f32 = rng.gen_range(0.0, 1.0);
+            let u = (x as f32 + r_x) / dim_x as f32;
+            let v = (y as f32 + r_y) / dim_y as f32;
 
-        let mut direction = lower_left_corner + horizontal * u + vertical * v;
-        // TODO Find a way to get around having to do this. Seems a bit hacky
-        direction = vector::Vec3::new(direction.x() * -1.0, direction.y() * -1.0, direction.z());
-        let ray = ray::Ray::new(origin, direction);
+            let ray = &cam.get_ray(u, v);
+            col = col + color(&ray, &world);
+        }
 
-        let color = color(&ray, &world);
-        let ir = (255.99 * color.x()) as u8;
-        let ig = (255.99 * color.y()) as u8;
-        let ib = (255.99 * color.z()) as u8;
+        col = col / (num_samples as f32);
+        let ir = (255.99 * col.x()) as u8;
+        let ig = (255.99 * col.y()) as u8;
+        let ib = (255.99 * col.z()) as u8;
 
         *pixel = image::Rgb([ir, ig, ib]);
     }
