@@ -8,7 +8,7 @@ pub struct Sphere {
 }
 
 impl Hitable for Sphere {
-    fn hit(self, r: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool {
         let oc = r.origin() - self.center;
         let a = r.direction().dot(&r.direction());
         let b = oc.dot(&r.direction()) * 2.0;
@@ -31,7 +31,7 @@ impl Hitable for Sphere {
                 return true
             }
         }
-        return false
+        false
     }
 }
 
