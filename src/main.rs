@@ -40,9 +40,6 @@ fn main() {
         let direction = lower_left_corner + horizontal * u + vertical * v;
         let ray = ray::Ray::new(origin, direction);
 
-        // TODO Will be used later
-        //let p = ray.point_at_t(2.0);
-
         let color = color(&ray, &world);
         let ir = (255.99 * color.x()) as u8;
         let ig = (255.99 * color.y()) as u8;

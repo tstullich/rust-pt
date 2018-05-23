@@ -21,8 +21,6 @@ impl Hitable for Sphere {
             if t_min < temp && temp < t_max {
                 record.t = temp;
                 record.p = r.point_at_t(record.t);
-                // TODO Investigate why this does not work properly to normalize
-                //record.normal = (record.p - self.center) / self.radius;
                 record.normal = (record.p - self.center).normalize();
                 return true
             }
@@ -30,7 +28,6 @@ impl Hitable for Sphere {
             if t_min < temp && temp < t_max {
                 record.t = temp;
                 record.p = r.point_at_t(record.t);
-                //record.normal = (record.p - self.center) / self.radius;
                 record.normal = (record.p - self.center).normalize();
                 return true
             }
