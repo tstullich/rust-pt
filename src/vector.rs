@@ -57,9 +57,6 @@ impl ops::Sub for Vec3 {
     }
 }
 
-/**
- * Implements the dot product of two vectors
- */
 impl ops::Mul<Vec3> for Vec3 {
     type Output = Vec3;
 
@@ -143,8 +140,8 @@ impl Vec3 {
         self.z -= scalar as f32;
     }
 
-    pub fn unit_vec(self) -> Vec3 {
-        self / self.length()
+    pub fn unit_vec(v: Vec3) -> Vec3 {
+        v / v.length()
     }
 
     pub fn x(self) -> f32 {

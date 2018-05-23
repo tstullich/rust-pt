@@ -14,9 +14,9 @@ fn color(r: &ray::Ray, world: &hitable_list::HitableList) -> vector::Vec3 {
                                  rec.normal.z() + 1.0) * 0.5
     }
 
-    let unit_direction = r.direction().unit_vec();
+    let unit_direction = vector::Vec3::unit_vec(r.direction());
     let t: f32 = (unit_direction.y() + 1.0) * 0.5;
-    vector::Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) +
+    return vector::Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) +
         vector::Vec3::new(0.5, 0.7, 1.0) * t
 }
 

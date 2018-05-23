@@ -13,21 +13,25 @@ impl Hitable for Sphere {
         let a = r.direction().dot(&r.direction());
         let b = oc.dot(&r.direction()) * 2.0;
         let c = oc.dot(&oc) - self.radius * self.radius;
-        let discriminant = b * b - (a * c * 4.0);
+        let discriminant = b * b - a * c;
 
         if discriminant > 0.0 {
-            let mut temp = (-b - discriminant.sqrt()) / a;
+            let sqt = discriminant.sqrt();
+            let mut temp = (-b - sqt) / a;
             if t_min < temp && temp < t_max {
                 record.t = temp;
                 record.p = r.point_at_t(record.t);
-                record.normal = (record.p - self.center) / self.radius;
+                // TODO Investigate why this does not work properly to normalize
+                //record.normal = (record.p - self.center) / self.radius;
+                record.normal = (record.p - self.center).normalize();
                 return true
             }
-            temp = (-b + (b * b - a * c).sqrt()) / a;
+            temp = (-b + sqt) / a;
             if t_min < temp && temp < t_max {
                 record.t = temp;
                 record.p = r.point_at_t(record.t);
-                record.normal = (record.p - self.center) / self.radius;
+                //record.normal = (record.p - self.center) / self.radius;
+                record.normal = (record.p - self.center).normalize();
                 return true
             }
         }
@@ -37,6 +41,6 @@ impl Hitable for Sphere {
 
 impl Sphere {
     pub fn new(center: Vec3, radius: f32) -> Sphere {
-        Sphere {center, radius}
+        Sphere { center, radius }
     }
 }
