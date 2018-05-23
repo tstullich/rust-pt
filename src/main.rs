@@ -37,10 +37,9 @@ fn main() {
         let u = x as f32 / img_x as f32;
         let v = y as f32 / img_y as f32;
 
-        // TODO Check what goes wrong here
         let mut direction = lower_left_corner + horizontal * u + vertical * v;
+        // TODO Find a way to get around having to do this. Seems a bit hacky
         direction = vector::Vec3::new(direction.x() * -1.0, direction.y() * -1.0, direction.z());
-        println!("{:?}", direction);
         let ray = ray::Ray::new(origin, direction);
 
         let color = color(&ray, &world);
