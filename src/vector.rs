@@ -101,6 +101,10 @@ impl Vec3 {
         Vec3 { x: self.x / mag, y: self.y / mag, z: self.z / mag }
     }
 
+    pub fn squared_length(&self) -> f32 {
+        self.x * self.x + self.y * self.y + self.z * self.z
+    }
+
     pub fn unit_vec(v: Vec3) -> Vec3 {
         v / v.length()
     }

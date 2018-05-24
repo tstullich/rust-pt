@@ -9,6 +9,13 @@ mod sphere;
 mod vector;
 
 use rand::{thread_rng, Rng};
+fn random_unit_in_sphere() {
+    let rng
+    let mut p = vector::Vec3::new(0.0, 0.0, 0.0);
+    while p.squared_length() >= 1.0 {
+        p = vector::Vec3()
+    }
+}
 
 fn color(r: &ray::Ray, world: &hitable_list::HitableList) -> vector::Vec3 {
     let mut rec: hitable::HitRecord = hitable::HitRecord::new();
