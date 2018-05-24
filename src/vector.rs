@@ -101,6 +101,18 @@ impl Vec3 {
         Vec3 { x: self.x / mag, y: self.y / mag, z: self.z / mag }
     }
 
+    pub fn set_x(mut self, x: f32) {
+        self.x = x;
+    }
+
+    pub fn set_y(&mut self, y: f32) {
+        self.y = y;
+    }
+
+    pub fn set_z(&mut self, z: f32) {
+        self.z = z;
+    }
+
     pub fn squared_length(self) -> f32 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
@@ -109,15 +121,15 @@ impl Vec3 {
         v / v.length()
     }
 
-    pub fn x(self) -> f32 {
+    pub fn x(&self) -> f32 {
         self.x
     }
 
-    pub fn y(self) -> f32 {
+    pub fn y(&self) -> f32 {
         self.y
     }
 
-    pub fn z(self) -> f32 {
+    pub fn z(&self) -> f32 {
         self.z
     }
 }

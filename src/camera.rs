@@ -22,10 +22,13 @@ impl Camera {
         let mut direction = self.lower_left_corner + self.horizontal * u
                             + self.vertical * v;
         // TODO Find a way to get around having to do this. Seems a bit hacky
-        direction = Vec3::new(direction.x() * -1.0,
-                              direction.y() * -1.0,
-                              direction.z());
-        //Ray { origin: self.origin, direction }
+        // Flipping the directions of the x and y coordinate since we write
+        // into our output buffer starting from the top left corner of our
+        // image and not from the bottom left
+        let x = direction.x();
+        let y = direction.y();
+        direction.set_x(x * -1.0);
+        direction.set_y(y * -1.0);
         Ray::new(self.origin, direction)
     }
 }
