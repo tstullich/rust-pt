@@ -43,20 +43,6 @@ impl ops::Div<f32> for Vec3 {
     }
 }
 
-impl cmp::PartialEq for Vec3 {
-    fn eq(&self, other: &Vec3) -> bool {
-        self.x == other.x && self.y == other.y && self.z == other.z
-    }
-}
-
-impl ops::Sub for Vec3 {
-    type Output = Vec3;
-
-    fn sub(self, other: Vec3) -> Vec3 {
-        Vec3 { x: self.x - other.x, y: self.y - other.y, z: self.z - other.z }
-    }
-}
-
 impl ops::Mul<Vec3> for Vec3 {
     type Output = Vec3;
 
@@ -75,6 +61,28 @@ impl ops::Mul<f32> for Vec3 {
 
     fn mul(self, scalar: f32) -> Vec3 {
         Vec3 { x: self.x * scalar, y: self.y * scalar, z: self.z * scalar }
+    }
+}
+
+impl cmp::PartialEq for Vec3 {
+    fn eq(&self, other: &Vec3) -> bool {
+        self.x == other.x && self.y == other.y && self.z == other.z
+    }
+}
+
+impl ops::Sub for Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, other: Vec3) -> Vec3 {
+        Vec3 { x: self.x - other.x, y: self.y - other.y, z: self.z - other.z }
+    }
+}
+
+impl ops::Sub<f32> for Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, other: f32) -> Vec3 {
+        Vec3 { x: self.x - other, y: self.y - other, z: self.z - other }
     }
 }
 
@@ -99,6 +107,11 @@ impl Vec3 {
     pub fn normalize(&self) -> Vec3 {
         let mag = Vec3::length(self);
         Vec3 { x: self.x / mag, y: self.y / mag, z: self.z / mag }
+    }
+
+    pub fn reflect(&self, b: Vec3) -> Vec3 {
+        let r = b * (self.dot(&b) * 2.0);
+        self.clone() - r
     }
 
     pub fn set_x(mut self, x: f32) {
