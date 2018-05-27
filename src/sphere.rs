@@ -1,4 +1,4 @@
-use hitable::{Hitable, HitRecord};
+use hitable::{HitRecord, Hitable};
 use ray::Ray;
 use vector::Vec3;
 
@@ -22,14 +22,14 @@ impl Hitable for Sphere {
                 record.t = temp;
                 record.p = r.point_at_t(record.t);
                 record.normal = (record.p - self.center) / self.radius;
-                return true
+                return true;
             }
             temp = (-b + sqt) / a;
             if t_min < temp && temp < t_max {
                 record.t = temp;
                 record.p = r.point_at_t(record.t);
                 record.normal = (record.p - self.center).normalize();
-                return true
+                return true;
             }
         }
         false

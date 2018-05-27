@@ -16,7 +16,11 @@ pub struct HitRecord {
 
 impl HitRecord {
     pub fn new() -> HitRecord {
-        HitRecord { t: 0.0, p: Vec3::new(0.0, 0.0, 0.0), normal: Vec3::new(0.0, 0.0, 0.0),
-                    material: Box::new(Lambertian::new(Vec3::new(0.0, 0.0, 0.0))) }
+        HitRecord {
+            t: 0.0,
+            p: Vec3::new(0.0, 0.0, 0.0),
+            normal: Vec3::new(0.0, 0.0, 0.0),
+            material: Box::new(Lambertian::new(Vec3::new(0.0, 0.0, 0.0))),
+        }
     }
 }

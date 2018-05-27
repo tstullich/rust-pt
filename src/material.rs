@@ -4,7 +4,13 @@ use ray::Ray;
 use vector::Vec3;
 
 pub trait Material {
-    fn scatter(self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool;
+    fn scatter(
+        self,
+        ray_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Vec3,
+        scattered: &mut Ray,
+    ) -> bool;
 }
 
 pub struct Lambertian {
@@ -12,7 +18,13 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
+    fn scatter(
+        self,
+        ray_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Vec3,
+        scattered: &mut Ray,
+    ) -> bool {
         let target = rec.p + rec.normal + Lambertian::random_unit_in_sphere();
         *scattered = Ray::new(rec.p, target - rec.p);
         *attenuation = self.albedo;
@@ -27,9 +39,11 @@ impl Lambertian {
 
     pub fn random_unit_in_sphere() -> Vec3 {
         let mut rng = thread_rng();
-        let mut p = Vec3::new(rng.gen_range(0.0, 1.0),
-                              rng.gen_range(0.0, 1.0),
-                              rng.gen_range(0.0, 1.0));
+        let mut p = Vec3::new(
+            rng.gen_range(0.0, 1.0),
+            rng.gen_range(0.0, 1.0),
+            rng.gen_range(0.0, 1.0),
+        );
 
         while p.squared_length() >= 1.0 {
             let rand_x: f32 = rng.gen_range(0.0, 1.0);
@@ -47,7 +61,13 @@ pub struct Metal {
 }
 
 impl Material for Metal {
-    fn scatter(self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
+    fn scatter(
+        self,
+        ray_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Vec3,
+        scattered: &mut Ray,
+    ) -> bool {
         let reflected = Vec3::unit_vec(ray_in.direction()).reflect(rec.normal);
         *scattered = Ray::new(rec.p, reflected);
         *attenuation = self.albedo;

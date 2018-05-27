@@ -1,4 +1,4 @@
-use hitable::{Hitable, HitRecord};
+use hitable::{HitRecord, Hitable};
 use ray::Ray;
 
 pub struct HitableList {

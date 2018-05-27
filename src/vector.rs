@@ -11,7 +11,11 @@ impl ops::Add for Vec3 {
     type Output = Vec3;
 
     fn add(self, other: Vec3) -> Vec3 {
-        Vec3 { x: self.x + other.x, y: self.y + other.y, z: self.z + other.z }
+        Vec3 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
     }
 }
 
@@ -25,7 +29,11 @@ impl ops::Div<Vec3> for Vec3 {
         if other.x == 0.0 || other.y == 0.0 || other.z == 0.0 {
             panic!("Denominator is 0!");
         }
-        Vec3 { x: self.x / other.x, y: self.y / other.y, z: self.z / other.z }
+        Vec3 {
+            x: self.x / other.x,
+            y: self.y / other.y,
+            z: self.z / other.z,
+        }
     }
 }
 
@@ -39,7 +47,11 @@ impl ops::Div<f32> for Vec3 {
         if scalar == 0.0 {
             panic!("Denominator is 0!");
         }
-        Vec3 { x: self.x / scalar, y: self.y / scalar, z: self.z / scalar }
+        Vec3 {
+            x: self.x / scalar,
+            y: self.y / scalar,
+            z: self.z / scalar,
+        }
     }
 }
 
@@ -47,7 +59,11 @@ impl ops::Mul<Vec3> for Vec3 {
     type Output = Vec3;
 
     fn mul(self, other: Vec3) -> Vec3 {
-        Vec3 { x: self.x * other.x, y: self.y * other.y, z: self.z * other.z }
+        Vec3 {
+            x: self.x * other.x,
+            y: self.y * other.y,
+            z: self.z * other.z,
+        }
     }
 }
 
@@ -60,7 +76,11 @@ impl ops::Mul<f32> for Vec3 {
     type Output = Vec3;
 
     fn mul(self, scalar: f32) -> Vec3 {
-        Vec3 { x: self.x * scalar, y: self.y * scalar, z: self.z * scalar }
+        Vec3 {
+            x: self.x * scalar,
+            y: self.y * scalar,
+            z: self.z * scalar,
+        }
     }
 }
 
@@ -74,7 +94,11 @@ impl ops::Sub for Vec3 {
     type Output = Vec3;
 
     fn sub(self, other: Vec3) -> Vec3 {
-        Vec3 { x: self.x - other.x, y: self.y - other.y, z: self.z - other.z }
+        Vec3 {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+        }
     }
 }
 
@@ -82,7 +106,11 @@ impl ops::Sub<f32> for Vec3 {
     type Output = Vec3;
 
     fn sub(self, other: f32) -> Vec3 {
-        Vec3 { x: self.x - other, y: self.y - other, z: self.z - other }
+        Vec3 {
+            x: self.x - other,
+            y: self.y - other,
+            z: self.z - other,
+        }
     }
 }
 
@@ -106,7 +134,11 @@ impl Vec3 {
 
     pub fn normalize(&self) -> Vec3 {
         let mag = Vec3::length(self);
-        Vec3 { x: self.x / mag, y: self.y / mag, z: self.z / mag }
+        Vec3 {
+            x: self.x / mag,
+            y: self.y / mag,
+            z: self.z / mag,
+        }
     }
 
     pub fn reflect(&self, b: Vec3) -> Vec3 {
