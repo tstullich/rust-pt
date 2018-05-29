@@ -15,12 +15,16 @@ impl Camera {
         let vertical = Vec3::new(0.0, 2.0, 0.0);
         let origin = Vec3::new(0.0, 0.0, 0.0);
 
-        Camera { lower_left_corner, horizontal, vertical, origin }
+        Camera {
+            lower_left_corner,
+            horizontal,
+            vertical,
+            origin,
+        }
     }
 
     pub fn get_ray(&self, u: f32, v: f32) -> Ray {
-        let mut direction = self.lower_left_corner + self.horizontal * u
-                            + self.vertical * v;
+        let mut direction = self.lower_left_corner + self.horizontal * u + self.vertical * v;
         // TODO Find a way to get around having to do this. Seems a bit hacky
         // Flipping the directions of the x and y coordinate since we write
         // into our output buffer starting from the top left corner of our

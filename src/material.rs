@@ -19,9 +19,11 @@ impl Material {
 
     fn random_unit_in_sphere(&self) -> Vec3 {
         let mut rng = thread_rng();
-        let mut p = Vec3::new(rng.gen_range(0.0, 1.0),
-                              rng.gen_range(0.0, 1.0),
-                              rng.gen_range(0.0, 1.0));
+        let mut p = Vec3::new(
+            rng.gen_range(0.0, 1.0),
+            rng.gen_range(0.0, 1.0),
+            rng.gen_range(0.0, 1.0),
+        );
 
         while p.squared_length() >= 1.0 {
             let rand_x: f32 = rng.gen_range(0.0, 1.0);

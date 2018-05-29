@@ -21,7 +21,10 @@ fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) ->
     if bounces > 0 && world.intersect(r, 0.001, std::f32::MAX, &mut rec) {
         let mut scattered = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0));
         let mut attenuation = Vec3::new(0.0, 0.0, 0.0);
-        if depth > 0 && rec.material.scatter(r, &rec, &mut attenuation, &mut scattered) {
+        if depth > 0
+            && rec.material
+                .scatter(r, &rec, &mut attenuation, &mut scattered)
+        {
             return color(&scattered, world, depth - 1, bounces - 1);
         } else {
             return Vec3::new(0.0, 0.0, 0.0);

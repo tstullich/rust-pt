@@ -9,7 +9,10 @@ pub struct Ray {
 impl Ray {
     // TODO Think about making a copy of a and b instead of moving
     pub fn new(a: Vec3, b: Vec3) -> Ray {
-        Ray { origin: a, direction: b }
+        Ray {
+            origin: a,
+            direction: b,
+        }
     }
 
     pub fn origin(self) -> Vec3 {
