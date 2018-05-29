@@ -11,6 +11,7 @@ mod vector;
 
 use rand::{thread_rng, Rng};
 use ray::Ray;
+use sphere::Sphere;
 use vector::Vec3;
 
 fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) -> Vec3 {
@@ -34,11 +35,11 @@ fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) ->
 
 fn main() {
     let mut world = hitable_list::HitableList::new();
-    world.add(Box::new(sphere::Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(sphere::Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
 
     let cam = camera::Camera::new();
-    let num_samples = 4;
+    let num_samples: u16 = 4;
     let mut rng = thread_rng();
     let dim_x: u32 = 2000;
     let dim_y: u32 = 1000;

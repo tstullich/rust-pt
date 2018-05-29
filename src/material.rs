@@ -3,29 +3,21 @@ use rand::{thread_rng, Rng};
 use ray::Ray;
 use vector::Vec3;
 
-pub trait Material {
-    fn scatter(self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool;
+#[derive(Copy, Clone)]
+pub enum Material {
+    Lambertian,
+    Metal,
 }
 
-pub struct Lambertian {
-    albedo: Vec3,
-}
-
-impl Material for Lambertian {
-    fn scatter(self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
-        let target = rec.p + rec.normal + Lambertian::random_unit_in_sphere();
-        *scattered = Ray::new(rec.p, target - rec.p);
-        *attenuation = self.albedo;
-        true
-    }
-}
-
-impl Lambertian {
-    pub fn new(albedo: Vec3) -> Lambertian {
-        Lambertian { albedo }
+impl Material {
+    pub fn scatter(&self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
+        match &self {
+            Material::Lambertian => self.lambertian(ray_in, rec, attenuation, scattered),
+            Material::Metal => self.metal(ray_in, rec, attenuation, scattered),
+        }
     }
 
-    pub fn random_unit_in_sphere() -> Vec3 {
+    fn random_unit_in_sphere(&self) -> Vec3 {
         let mut rng = thread_rng();
         let mut p = Vec3::new(rng.gen_range(0.0, 1.0),
                               rng.gen_range(0.0, 1.0),
@@ -40,24 +32,21 @@ impl Lambertian {
         }
         p
     }
-}
 
-pub struct Metal {
-    albedo: Vec3,
-}
+    fn lambertian(&self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
+        let target = rec.p + rec.normal + self.random_unit_in_sphere();
+        *scattered = Ray::new(rec.p, target - rec.p);
+        // TODO Fix so albedo is value set from enum
+        *attenuation = Vec3::new(0.0, 0.0, 0.0);
+        true
+    }
 
-impl Material for Metal {
-    fn scatter(self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
+    fn metal(&self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
         let reflected = Vec3::unit_vec(ray_in.direction()).reflect(rec.normal);
         *scattered = Ray::new(rec.p, reflected);
-        *attenuation = self.albedo;
+        // TODO Fix so albedo is value set from enum
+        *attenuation = Vec3::new(0.0, 0.0, 0.0);
 
         scattered.direction().dot(&rec.normal) > 0.0
-    }
-}
-
-impl Metal {
-    pub fn new(albedo: Vec3) -> Metal {
-        Metal { albedo }
     }
 }
