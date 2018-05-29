@@ -10,7 +10,13 @@ pub enum Material {
 }
 
 impl Material {
-    pub fn scatter(&self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
+    pub fn scatter(
+        &self,
+        ray_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Vec3,
+        scattered: &mut Ray,
+    ) -> bool {
         match &self {
             Material::Lambertian => self.lambertian(ray_in, rec, attenuation, scattered),
             Material::Metal => self.metal(ray_in, rec, attenuation, scattered),
@@ -35,7 +41,13 @@ impl Material {
         p
     }
 
-    fn lambertian(&self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
+    fn lambertian(
+        &self,
+        ray_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Vec3,
+        scattered: &mut Ray,
+    ) -> bool {
         let target = rec.p + rec.normal + self.random_unit_in_sphere();
         *scattered = Ray::new(rec.p, target - rec.p);
         // TODO Fix so albedo is value set from enum
@@ -43,7 +55,13 @@ impl Material {
         true
     }
 
-    fn metal(&self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
+    fn metal(
+        &self,
+        ray_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Vec3,
+        scattered: &mut Ray,
+    ) -> bool {
         let reflected = Vec3::unit_vec(ray_in.direction()).reflect(rec.normal);
         *scattered = Ray::new(rec.p, reflected);
         // TODO Fix so albedo is value set from enum
