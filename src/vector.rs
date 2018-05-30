@@ -124,6 +124,22 @@ impl Vec3 {
         Vec3 { x, y, z }
     }
 
+    //pub fn cross(&self, b: &Vec3) -> Vec3 {
+    //    Vec3 {
+    //        x: self.y * b.z - self.z * b.y,
+    //        y: self.z * b.x - self.x * b.z,
+    //        z: self.x * b.y - self.y * b.x,
+    //    }
+    //}
+
+    pub fn cross(&self, b: &Vec3) -> Vec3 {
+        Vec3 {
+            x: self.y * b.z - self.z * b.y,
+            y: -(self.x * b.z) - self.z * b.x,
+            z: self.x * b.y - self.y * b.x,
+        }
+    }
+
     pub fn dot(&self, b: &Vec3) -> f32 {
         (self.x * b.x) + (self.y * b.y) + (self.z * b.z)
     }
@@ -138,7 +154,7 @@ impl Vec3 {
         self.clone() - r
     }
 
-    pub fn set_x(mut self, x: f32) {
+    pub fn set_x(&mut self, x: f32) {
         self.x = x;
     }
 

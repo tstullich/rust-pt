@@ -32,7 +32,8 @@ fn compute_scatter_ray(intersected: &HitRecord, r: &Ray) -> Option<Ray> {
  * executed until we have reached a finite number of bounces or we are
  * unable to intersect anymore geometry.
  */
-fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) -> Vec3 {
+fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u32) -> Vec3 {
+    // TODO Consider taking this out
     if bounces > 0 {
         let hit_object = world.intersect(r, 0.001, std::f32::MAX);
         if hit_object.is_some() {
@@ -57,6 +58,25 @@ fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) ->
 }
 
 fn main() {
+    // Final output settings
+    let dim_x: u32 = 1000;
+    let dim_y: u32 = 500;
+
+    // Camera setup
+    let lookfrom = Vec3::new(3.0, 3.0, 2.0);
+    let lookat = Vec3::new(0.0, 0.0, -1.0);
+    let dist_to_focus = (lookfrom - lookat).length();
+    let aperture = 2.0;
+    let cam = camera::Camera::new(
+        lookfrom,
+        lookat,
+        Vec3::new(0.0, 1.0, 0.0),
+        45.0,
+        (dim_x / dim_y) as f32,
+        aperture,
+        dist_to_focus,
+    );
+
     // Create our scene and add some geometry
     let mut world = hitable_list::HitableList::new();
     world.add(Box::new(Sphere::new(
@@ -72,26 +92,19 @@ fn main() {
     world.add(Box::new(Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Material::Metal(Vec3::new(0.8, 0.6, 0.2), 0.3),
+        Material::Metal(Vec3::new(0.8, 0.6, 0.2), 1.0),
     )));
     world.add(Box::new(Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
         Material::Dielectric(Vec3::new(1.0, 1.0, 1.0), 1.5),
     )));
-    world.add(Box::new(Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
-        -0.45,
-        Material::Dielectric(Vec3::new(1.0, 1.0, 1.0), 1.5),
-    )));
 
-    let cam = camera::Camera::new();
-    let num_samples: u16 = 8;
-    let mut rng = thread_rng();
-    let dim_x: u32 = 1000;
-    let dim_y: u32 = 500;
-    let bounces: u8 = 16;
+    // Options pertaining to the actual path tracing
+    let bounces: u32 = 2000;
     let depth: u32 = 0;
+    let num_samples: u16 = 16;
+    let mut rng = thread_rng();
     let mut imgbuf = image::ImageBuffer::new(dim_x, dim_y);
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         let mut col = vector::Vec3::new(0.0, 0.0, 0.0);

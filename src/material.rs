@@ -35,28 +35,6 @@ impl Material {
     }
 
     /*
-     * This is used in the diffuse and metal surface reflection calculations
-     * to find a new random vector to reflect to
-     */
-    fn random_unit_in_sphere(&self) -> Vec3 {
-        let mut rng = thread_rng();
-        let mut p = Vec3::new(
-            rng.gen_range(0.0, 1.0),
-            rng.gen_range(0.0, 1.0),
-            rng.gen_range(0.0, 1.0),
-        );
-
-        while p.squared_length() >= 1.0 {
-            let rand_x: f32 = rng.gen_range(0.0, 1.0);
-            let rand_y: f32 = rng.gen_range(0.0, 1.0);
-            let rand_z: f32 = rng.gen_range(0.0, 1.0);
-            p = Vec3::new(rand_x, rand_y, rand_z) * 2.0;
-            p = p - Vec3::new(1.0, 1.0, 1.0);
-        }
-        p
-    }
-
-    /*
      * Scatter function for a Lambertian diffuse surface.
      */
     fn lambertian(&self, rec: &HitRecord) -> Option<Ray> {
@@ -110,6 +88,28 @@ impl Material {
         } else {
             Some(Ray::new(rec.p, refracted.unwrap()))
         }
+    }
+
+    /*
+     * This is used in the diffuse and metal surface reflection calculations
+     * to find a new random vector to reflect to
+     */
+    fn random_unit_in_sphere(&self) -> Vec3 {
+        let mut rng = thread_rng();
+        let mut p = Vec3::new(
+            rng.gen_range(0.0, 1.0),
+            rng.gen_range(0.0, 1.0),
+            rng.gen_range(0.0, 1.0),
+        );
+
+        while p.squared_length() >= 1.0 {
+            let rand_x: f32 = rng.gen_range(0.0, 1.0);
+            let rand_y: f32 = rng.gen_range(0.0, 1.0);
+            let rand_z: f32 = rng.gen_range(0.0, 1.0);
+            p = Vec3::new(rand_x, rand_y, rand_z) * 2.0;
+            p = p - Vec3::new(1.0, 1.0, 1.0);
+        }
+        p
     }
 
     // Calculates the refraction angle if we are using a dielectric material
