@@ -49,7 +49,7 @@ fn main() {
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
         0.5,
-        Material::Lambertian(Vec3::new(0.8, 0.3, 0.3)),
+        Material::Lambertian(Vec3::new(0.1, 0.2, 0.5)),
     )));
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
@@ -59,20 +59,25 @@ fn main() {
     world.add(Box::new(Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Material::Metal(Vec3::new(0.8, 0.6, 0.2)),
+        Material::Metal(Vec3::new(0.8, 0.6, 0.2), 0.3),
     )));
     world.add(Box::new(Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
-        Material::Metal(Vec3::new(0.8, 0.8, 0.8)),
+        Material::Dielectric(Vec3::new(1.0, 1.0, 1.0), 1.5),
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        -0.45,
+        Material::Dielectric(Vec3::new(1.0, 1.0, 1.0), 1.5),
     )));
 
     let cam = camera::Camera::new();
-    let num_samples: u16 = 4;
+    let num_samples: u16 = 8;
     let mut rng = thread_rng();
     let dim_x: u32 = 1000;
     let dim_y: u32 = 500;
-    let bounces: u8 = 4;
+    let bounces: u8 = 16;
     let depth: u32 = 0;
     let mut imgbuf = image::ImageBuffer::new(dim_x, dim_y);
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
