@@ -11,6 +11,16 @@ pub enum Material {
 }
 
 impl Material {
+    /* A generalized scatter function based on the type of material
+     * that is specified for the surface. Currently there are three
+     * options available are:
+     * 1. Lambertian diffuse surface
+     * 2. Metal surface with a tune-able fuzzy factor
+     * 3. Dielectric surfaces with specular reflection
+     * The return type of Option<Ray> allows us to indicate if ray was
+     * reflected or not. In case of the metal material, the light might
+     * not be reflected
+     */
     pub fn scatter(&self, ray: &Ray, rec: &HitRecord) -> Option<Ray> {
         match &self {
             Material::Lambertian(_) => self.lambertian(rec),
@@ -24,6 +34,10 @@ impl Material {
         }
     }
 
+    /*
+     * This is used in the diffuse and metal surface reflection calculations
+     * to find a new random vector to reflect to
+     */
     fn random_unit_in_sphere(&self) -> Vec3 {
         let mut rng = thread_rng();
         let mut p = Vec3::new(
@@ -42,11 +56,20 @@ impl Material {
         p
     }
 
+    /*
+     * Scatter function for a Lambertian diffuse surface.
+     */
     fn lambertian(&self, rec: &HitRecord) -> Option<Ray> {
         let target = rec.p + rec.normal + self.random_unit_in_sphere();
         Some(Ray::new(rec.p, target - rec.p))
     }
 
+    /*
+     * Scatter function for a metal surface. We are able to adjust
+     * the "roughess" of the surface through a fuzzy factor that
+     * makes it so the surface scatters more light and the reflection
+     * starts to become more diffuse.
+     */
     fn metal(&self, ray: &Ray, fuzz: f32, rec: &HitRecord) -> Option<Ray> {
         let reflected = Vec3::unit_vec(ray.direction()).reflect(rec.normal);
         let fuzzed_reflector = reflected + self.random_unit_in_sphere() * fuzz;
@@ -59,6 +82,7 @@ impl Material {
         };
     }
 
+    // Calculates the next outgoing ray for a dielectric surface.
     fn dielectric(&self, ref_idx: f32, ray: &Ray, rec: &HitRecord) -> Option<Ray> {
         let reflected = ray.direction().reflect(rec.normal);
         let (outward_normal, ni_over_nt, cosine) = if ray.direction().dot(&rec.normal) > 0.0 {
@@ -88,6 +112,7 @@ impl Material {
         }
     }
 
+    // Calculates the refraction angle if we are using a dielectric material
     fn refract(&self, v: &Vec3, normal: &Vec3, ni_over_nt: f32) -> Option<Vec3> {
         let uv = Vec3::unit_vec(*v);
         let dt = uv.dot(normal);
@@ -100,6 +125,7 @@ impl Material {
         };
     }
 
+    // Calculates the Fresnel factor in a specular reflection
     fn schlick(&self, cosine: f32, ref_idx: f32) -> f32 {
         let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
         r0 *= r0;

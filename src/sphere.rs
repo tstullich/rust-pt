@@ -9,6 +9,10 @@ pub struct Sphere {
     pub material: Material,
 }
 
+/*
+ * My simple implementation for a sphere object. Going to check if I
+ * can improve the performance of the intersection test code somehow.
+ */
 impl Hitable for Sphere {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = r.origin() - self.center;

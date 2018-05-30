@@ -6,6 +6,10 @@ pub trait Hitable {
     fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
 }
 
+/*
+ * A datat structure that holds some info about the object that was
+ * intersected in the scene
+ */
 pub struct HitRecord {
     pub t: f32,
     pub p: Vec3,

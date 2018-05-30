@@ -17,10 +17,21 @@ use sphere::Sphere;
 use vector::Vec3;
 
 // Computes the next ray based on the material that the Hitable object posseses
+// We could theoretically move this back into the color() function. I might
+// go ahead and do that later
 fn compute_scatter_ray(intersected: &HitRecord, r: &Ray) -> Option<Ray> {
     intersected.material.scatter(r, &intersected)
 }
 
+/*
+ * This is the function that currently does the most work for my path tracer.
+ * The function calculates a color value by taking the initial ray passed in
+ * through the main function, determines if any intersections have been made
+ * with any of the geometry in the scene and then calculating a scattered
+ * ray based on the type of material given. This process is recursively
+ * executed until we have reached a finite number of bounces or we are
+ * unable to intersect anymore geometry.
+ */
 fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) -> Vec3 {
     if bounces > 0 {
         let hit_object = world.intersect(r, 0.001, std::f32::MAX);
@@ -29,6 +40,7 @@ fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) ->
             let obj = hit_object.unwrap();
             // Compute where the next ray is going to bounce
             let scattered = compute_scatter_ray(&obj, r);
+            // TODO Make the depth parameter adjustable
             if depth < 50 && scattered.is_some() {
                 return color(&scattered.unwrap(), world, depth + 1, bounces - 1)
                     * obj.material.attenuation();
@@ -45,6 +57,7 @@ fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) ->
 }
 
 fn main() {
+    // Create our scene and add some geometry
     let mut world = hitable_list::HitableList::new();
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),

@@ -7,6 +7,11 @@ pub struct Vec3 {
     z: f32,
 }
 
+/*
+ * This is a general utility function to allow us to
+ * perform various forms of vector arithmetic. The
+ * functions below should be pretty self-explanatory
+ */
 impl ops::Add for Vec3 {
     type Output = Vec3;
 
@@ -19,7 +24,7 @@ impl ops::Add for Vec3 {
     }
 }
 
-/**
+/*
  * Function to divide one vector with another
  */
 impl ops::Div<Vec3> for Vec3 {
@@ -37,7 +42,7 @@ impl ops::Div<Vec3> for Vec3 {
     }
 }
 
-/**
+/*
  * Function to divide a vector with a scalar
  */
 impl ops::Div<f32> for Vec3 {
@@ -67,7 +72,7 @@ impl ops::Mul<Vec3> for Vec3 {
     }
 }
 
-/**
+/*
  * Implements scalar multiplication
  * TODO Make this a binary operator so
  * we can do <scalar> * <Vec3> or <Vec3> * <scalar>
@@ -114,10 +119,6 @@ impl ops::Sub<f32> for Vec3 {
     }
 }
 
-/**
- * Some of the functions below are mutable and therefore modify the
- * calling class.
- */
 impl Vec3 {
     pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
         Vec3 { x, y, z }
