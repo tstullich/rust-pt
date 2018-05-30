@@ -15,17 +15,24 @@ impl HitableList {
         self.objs.push(obj);
     }
 
-    pub fn intersect(&self, r: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool {
-        let mut temp_rec = HitRecord::new();
-        let mut hit_anything = false;
+    pub fn intersect(
+        &self,
+        r: &Ray,
+        t_min: f32,
+        t_max: f32,
+    ) -> Option<HitRecord> {
+        let mut temp_rec = None;
         let mut closest_so_far = t_max;
         for obj in &self.objs {
-            if obj.hit(r, t_min, closest_so_far, &mut temp_rec) {
-                hit_anything = true;
-                closest_so_far = temp_rec.t;
-                *record = temp_rec;
+            let intersect_result = obj.hit(r, t_min, closest_so_far);
+            match intersect_result {
+                Some(hit) => {
+                    closest_so_far = hit.t;
+                    temp_rec = Some(hit);
+                },
+                None => (),
             }
         }
-        hit_anything
+        temp_rec
     }
 }

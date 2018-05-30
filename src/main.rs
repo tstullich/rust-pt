@@ -9,37 +9,43 @@ mod ray;
 mod sphere;
 mod vector;
 
+use hitable::{HitRecord, Hitable};
+use material::Material;
 use rand::{thread_rng, Rng};
 use ray::Ray;
 use sphere::Sphere;
 use vector::Vec3;
 
+// Computes the next ray based on the material that the Hitable object posseses
+fn compute_scatter_ray(intersected: &HitRecord, r: &Ray, rec: &mut HitRecord) -> Option<Ray> {
+    intersected.material.scatter(r, &rec, intersected.material.attenuation())
+}
+
 fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) -> Vec3 {
     let mut rec: hitable::HitRecord = hitable::HitRecord::new();
     // Going to restrict the number of times a ray can bounce for now
     // otherwise we run into stack overflow problems
-    if bounces > 0 && world.intersect(r, 0.001, std::f32::MAX, &mut rec) {
-        let mut scattered = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0));
-        let mut attenuation = Vec3::new(0.0, 0.0, 0.0);
-        if depth > 0
-            && rec.material
-                .scatter(r, &rec, &mut attenuation, &mut scattered)
-        {
-            return color(&scattered, world, depth - 1, bounces - 1);
-        } else {
-            return Vec3::new(0.0, 0.0, 0.0);
+    if bounces > 0 {
+        let hit_object = world.intersect(r, 0.001, std::f32::MAX);
+        // TODO Check if this if statement still holds
+        if depth > 0 && hit_object.is_some() {
+            let scattered = compute_scatter_ray(&hit_object.unwrap(), r, &mut rec);
+            match scattered {
+                Some(ref ray) => color(&ray, world, depth - 1, bounces - 1),
+                None => Vec3::new(0.0, 0.0, 0.0),
+            };
         }
     }
 
     let unit_direction = Vec3::unit_vec(r.direction());
     let t: f32 = (unit_direction.y() + 1.0) * 0.5;
-    return Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t;
+    Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
 }
 
 fn main() {
     let mut world = hitable_list::HitableList::new();
     world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0,)));
 
     let cam = camera::Camera::new();
     let num_samples: u16 = 4;

@@ -8,7 +8,7 @@ pub struct Sphere {
 }
 
 impl Hitable for Sphere {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = r.origin() - self.center;
         let a = r.direction().dot(&r.direction());
         let b = oc.dot(&r.direction());
@@ -18,21 +18,22 @@ impl Hitable for Sphere {
         if discriminant > 0.0 {
             let sqt = discriminant.sqrt();
             let mut temp = (-b - sqt) / a;
+            let mut record = HitRecord::new();
             if t_min < temp && temp < t_max {
                 record.t = temp;
                 record.p = r.point_at_t(record.t);
                 record.normal = (record.p - self.center) / self.radius;
-                return true;
+                return Some(record);
             }
             temp = (-b + sqt) / a;
             if t_min < temp && temp < t_max {
                 record.t = temp;
                 record.p = r.point_at_t(record.t);
-                record.normal = (record.p - self.center).normalize();
-                return true;
+                record.normal = (record.p - self.center) / self.radius;
+                return Some(record);
             }
         }
-        false
+        None
     }
 }
 
