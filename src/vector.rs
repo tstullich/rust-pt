@@ -132,15 +132,6 @@ impl Vec3 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
-    pub fn normalize(&self) -> Vec3 {
-        let mag = Vec3::length(self);
-        Vec3 {
-            x: self.x / mag,
-            y: self.y / mag,
-            z: self.z / mag,
-        }
-    }
-
     pub fn reflect(&self, b: Vec3) -> Vec3 {
         let r = b * (self.dot(&b) * 2.0);
         self.clone() - r
@@ -152,10 +143,6 @@ impl Vec3 {
 
     pub fn set_y(&mut self, y: f32) {
         self.y = y;
-    }
-
-    pub fn set_z(&mut self, z: f32) {
-        self.z = z;
     }
 
     pub fn squared_length(self) -> f32 {

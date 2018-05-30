@@ -9,7 +9,7 @@ mod ray;
 mod sphere;
 mod vector;
 
-use hitable::{HitRecord, Hitable};
+use hitable::HitRecord;
 use material::Material;
 use rand::{thread_rng, Rng};
 use ray::Ray;
@@ -17,23 +17,25 @@ use sphere::Sphere;
 use vector::Vec3;
 
 // Computes the next ray based on the material that the Hitable object posseses
-fn compute_scatter_ray(intersected: &HitRecord, r: &Ray, rec: &mut HitRecord) -> Option<Ray> {
-    intersected.material.scatter(r, &rec, intersected.material.attenuation())
+fn compute_scatter_ray(intersected: &HitRecord, r: &Ray) -> Option<Ray> {
+    intersected.material.scatter(r, &intersected)
 }
 
 fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) -> Vec3 {
-    let mut rec: hitable::HitRecord = hitable::HitRecord::new();
-    // Going to restrict the number of times a ray can bounce for now
-    // otherwise we run into stack overflow problems
     if bounces > 0 {
         let hit_object = world.intersect(r, 0.001, std::f32::MAX);
-        // TODO Check if this if statement still holds
-        if depth > 0 && hit_object.is_some() {
-            let scattered = compute_scatter_ray(&hit_object.unwrap(), r, &mut rec);
-            match scattered {
-                Some(ref ray) => color(&ray, world, depth - 1, bounces - 1),
-                None => Vec3::new(0.0, 0.0, 0.0),
-            };
+        if hit_object.is_some() {
+            // Retrieve intersected object properties
+            let obj = hit_object.unwrap();
+            // Compute where the next ray is going to bounce
+            let scattered = compute_scatter_ray(&obj, r);
+            if depth < 50 && scattered.is_some() {
+                return color(&scattered.unwrap(), world, depth + 1, bounces - 1)
+                    * obj.material.attenuation();
+            } else {
+                // If we do not intercept anymore geometry we are finished
+                return Vec3::new(0.0, 0.0, 0.0);
+            }
         }
     }
 
@@ -44,16 +46,34 @@ fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u8) ->
 
 fn main() {
     let mut world = hitable_list::HitableList::new();
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0,)));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        Material::Lambertian(Vec3::new(0.8, 0.3, 0.3)),
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        Material::Lambertian(Vec3::new(0.8, 0.8, 0.0)),
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(1.0, 0.0, -1.0),
+        0.5,
+        Material::Metal(Vec3::new(0.8, 0.6, 0.2)),
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        Material::Metal(Vec3::new(0.8, 0.8, 0.8)),
+    )));
 
     let cam = camera::Camera::new();
     let num_samples: u16 = 4;
     let mut rng = thread_rng();
-    let dim_x: u32 = 2000;
-    let dim_y: u32 = 1000;
+    let dim_x: u32 = 1000;
+    let dim_y: u32 = 500;
     let bounces: u8 = 4;
-    let depth: u32 = 50;
+    let depth: u32 = 0;
     let mut imgbuf = image::ImageBuffer::new(dim_x, dim_y);
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         let mut col = vector::Vec3::new(0.0, 0.0, 0.0);

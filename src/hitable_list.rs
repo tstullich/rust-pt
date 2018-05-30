@@ -15,12 +15,7 @@ impl HitableList {
         self.objs.push(obj);
     }
 
-    pub fn intersect(
-        &self,
-        r: &Ray,
-        t_min: f32,
-        t_max: f32,
-    ) -> Option<HitRecord> {
+    pub fn intersect(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut temp_rec = None;
         let mut closest_so_far = t_max;
         for obj in &self.objs {
@@ -29,7 +24,7 @@ impl HitableList {
                 Some(hit) => {
                     closest_so_far = hit.t;
                     temp_rec = Some(hit);
-                },
+                }
                 None => (),
             }
         }
