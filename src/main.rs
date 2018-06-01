@@ -87,7 +87,7 @@ fn main() {
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
         100.0,
-        Material::Lambertian(Vec3::new(0.8, 0.8, 0.8)),
+        Material::Lambertian(Vec3::new(0.56, 0.56, 0.56)),
     )));
     world.add(Box::new(Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
