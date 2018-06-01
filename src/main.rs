@@ -71,7 +71,7 @@ fn main() {
         lookfrom,
         lookat,
         Vec3::new(0.0, 1.0, 0.0),
-        45.0,
+        20.0,
         (dim_x / dim_y) as f32,
         aperture,
         dist_to_focus,
