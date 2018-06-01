@@ -38,7 +38,7 @@ impl Camera {
         let v = w.cross(&u);
 
         let lower_left_corner =
-            origin - (u * half_width) - (v * half_height * focus_dist) - (w * focus_dist);
+            origin - (u * half_width * focus_dist) - (v * half_height * focus_dist) - (w * focus_dist);
         let horizontal = u * half_width * focus_dist * 2.0;
         let vertical = v * half_height * focus_dist * 2.0;
 

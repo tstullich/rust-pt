@@ -66,7 +66,7 @@ fn main() {
     let lookfrom = Vec3::new(3.0, 3.0, 2.0);
     let lookat = Vec3::new(0.0, 0.0, -1.0);
     let dist_to_focus = (lookfrom - lookat).length();
-    let aperture = 2.0;
+    let aperture = 0.2;
     let cam = camera::Camera::new(
         lookfrom,
         lookat,
@@ -87,12 +87,12 @@ fn main() {
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
         100.0,
-        Material::Lambertian(Vec3::new(0.8, 0.8, 0.0)),
+        Material::Lambertian(Vec3::new(0.8, 0.8, 0.8)),
     )));
     world.add(Box::new(Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Material::Metal(Vec3::new(0.8, 0.6, 0.2), 1.0),
+        Material::Metal(Vec3::new(0.8, 0.6, 0.2), 0.1),
     )));
     world.add(Box::new(Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),

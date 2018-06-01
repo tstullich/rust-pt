@@ -73,7 +73,6 @@ impl ops::Mul<Vec3> for Vec3 {
 }
 
 /*
- * Implements scalar multiplication
  * TODO Make this a binary operator so
  * we can do <scalar> * <Vec3> or <Vec3> * <scalar>
  */
@@ -127,7 +126,7 @@ impl Vec3 {
     pub fn cross(&self, b: &Vec3) -> Vec3 {
         Vec3 {
             x: self.y * b.z - self.z * b.y,
-            y: -(self.x * b.z) - self.z * b.x,
+            y: self.z * b.x - self.x * b.z,
             z: self.x * b.y - self.y * b.x,
         }
     }
