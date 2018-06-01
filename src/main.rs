@@ -7,6 +7,7 @@ mod hitable_list;
 mod material;
 mod ray;
 mod sphere;
+mod triangle;
 mod vector;
 
 use hitable::HitRecord;
@@ -32,23 +33,20 @@ fn compute_scatter_ray(intersected: &HitRecord, r: &Ray) -> Option<Ray> {
  * executed until we have reached a finite number of bounces or we are
  * unable to intersect anymore geometry.
  */
-fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u32) -> Vec3 {
-    // TODO Consider taking this out
-    if bounces > 0 {
-        let hit_object = world.intersect(r, 0.001, std::f32::MAX);
-        if hit_object.is_some() {
-            // Retrieve intersected object properties
-            let obj = hit_object.unwrap();
-            // Compute where the next ray is going to bounce
-            let scattered = compute_scatter_ray(&obj, r);
-            // TODO Make the depth parameter adjustable
-            if depth < 50 && scattered.is_some() {
-                return color(&scattered.unwrap(), world, depth + 1, bounces - 1)
-                    * obj.material.color();
-            } else {
-                // If we do not intercept anymore geometry we are finished
-                return Vec3::new(0.0, 0.0, 0.0);
-            }
+fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32) -> Vec3 {
+    let hit_object = world.intersect(r, 0.001, std::f32::MAX);
+    if hit_object.is_some() {
+        // Retrieve intersected object properties
+        let obj = hit_object.unwrap();
+        // Compute where the next ray is going to bounce
+        let scattered = compute_scatter_ray(&obj, r);
+        // TODO Make the depth parameter adjustable
+        if depth < 50 && scattered.is_some() {
+            return color(&scattered.unwrap(), world, depth + 1)
+                * obj.material.color();
+        } else {
+            // If we do not intercept anymore geometry we are finished
+            return Vec3::new(0.0, 0.0, 0.0);
         }
     }
 
@@ -59,7 +57,7 @@ fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u32) -
 
 fn main() {
     // Final output settings
-    let dim_x: u32 = 1000;
+    let dim_x: u32 = 1200;
     let dim_y: u32 = 500;
 
     // Camera setup
@@ -101,7 +99,6 @@ fn main() {
     )));
 
     // Options pertaining to the actual path tracing
-    let bounces: u32 = 2000;
     let depth: u32 = 0;
     let num_samples: u16 = 16;
     let mut rng = thread_rng();
@@ -117,7 +114,7 @@ fn main() {
             let v = (y as f32 + r_y) / dim_y as f32;
 
             let ray = &cam.get_ray(u, v);
-            col = col + color(&ray, &world, depth, bounces);
+            col = col + color(&ray, &world, depth);
         }
 
         // Apply antialising by taking average of samples

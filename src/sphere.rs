@@ -16,8 +16,9 @@ pub struct Sphere {
 impl Hitable for Sphere {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = r.origin() - self.position;
-        let a = r.direction().dot(&r.direction());
-        let b = oc.dot(&r.direction());
+        let r_dir = r.direction();
+        let a = r_dir.dot(&r_dir);
+        let b = oc.dot(&r_dir);
         let c = oc.dot(&oc) - self.radius * self.radius;
         let discriminant = b * b - a * c;
 
