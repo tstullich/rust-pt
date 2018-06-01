@@ -132,11 +132,11 @@ impl Material {
         r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
     }
 
-    pub fn attenuation(self) -> Vec3 {
+    pub fn color(self) -> Vec3 {
         match self {
-            Material::Lambertian(attenuation) => attenuation,
-            Material::Metal(attenuation, _) => attenuation,
-            Material::Dielectric(attenuation, _) => attenuation,
+            Material::Lambertian(color) => color,
+            Material::Metal(color, _) => color,
+            Material::Dielectric(color, _) => color,
         }
     }
 }

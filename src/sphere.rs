@@ -4,7 +4,7 @@ use ray::Ray;
 use vector::Vec3;
 
 pub struct Sphere {
-    pub center: Vec3,
+    pub position: Vec3,
     pub radius: f32,
     pub material: Material,
 }
@@ -15,7 +15,7 @@ pub struct Sphere {
  */
 impl Hitable for Sphere {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
-        let oc = r.origin() - self.center;
+        let oc = r.origin() - self.position;
         let a = r.direction().dot(&r.direction());
         let b = oc.dot(&r.direction());
         let c = oc.dot(&oc) - self.radius * self.radius;
@@ -28,7 +28,7 @@ impl Hitable for Sphere {
             if t_min < temp && temp < t_max {
                 record.t = temp;
                 record.p = r.point_at_t(record.t);
-                record.normal = (record.p - self.center) / self.radius;
+                record.normal = (record.p - self.position) / self.radius;
                 record.material = self.material;
                 return Some(record);
             }
@@ -36,7 +36,7 @@ impl Hitable for Sphere {
             if t_min < temp && temp < t_max {
                 record.t = temp;
                 record.p = r.point_at_t(record.t);
-                record.normal = (record.p - self.center) / self.radius;
+                record.normal = (record.p - self.position) / self.radius;
                 record.material = self.material;
                 return Some(record);
             }
@@ -46,9 +46,9 @@ impl Hitable for Sphere {
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f32, material: Material) -> Sphere {
+    pub fn new(position: Vec3, radius: f32, material: Material) -> Sphere {
         Sphere {
-            center,
+            position,
             radius,
             material,
         }

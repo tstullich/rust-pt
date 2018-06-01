@@ -44,7 +44,7 @@ fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32, bounces: u32) -
             // TODO Make the depth parameter adjustable
             if depth < 50 && scattered.is_some() {
                 return color(&scattered.unwrap(), world, depth + 1, bounces - 1)
-                    * obj.material.attenuation();
+                    * obj.material.color();
             } else {
                 // If we do not intercept anymore geometry we are finished
                 return Vec3::new(0.0, 0.0, 0.0);
@@ -92,7 +92,7 @@ fn main() {
     world.add(Box::new(Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Material::Metal(Vec3::new(0.8, 0.6, 0.2), 0.1),
+        Material::Metal(Vec3::new(0.8, 0.6, 0.2), 0.0),
     )));
     world.add(Box::new(Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
