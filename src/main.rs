@@ -66,14 +66,14 @@ fn main() {
     // Flipping the directions of the x and y coordinate since we write
     // into our output buffer starting from the top left corner of our
     // image and not from the bottom left
-    let lookfrom = Vec3::new(-4.0, 2.0, 10.0);
+    let lookfrom = Vec3::new(4.0, 2.0, 10.0);
     let lookat = Vec3::new(0.0, 0.0, -1.0);
     let dist_to_focus = (lookfrom - lookat).length();
     let aperture = 0.1;
     let cam = camera::Camera::new(
         lookfrom,
         lookat,
-        Vec3::new(0.0, -1.0, 0.0),
+        Vec3::new(0.0, 1.0, 0.0),
         20.0,
         (dim_x / dim_y) as f32,
         aperture,
@@ -83,27 +83,31 @@ fn main() {
     // Create our scene and add some geometry
     let mut world = hitable_list::HitableList::new();
     world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 0.0, 0.0),
         0.5,
         Material::Lambertian(Vec3::new(0.1, 0.2, 0.5)),
     )));
+
     world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, -100.5, -1.0),
+        Vec3::new(0.0, -100.5, 0.0),
         100.0,
-        Material::Lambertian(Vec3::new(0.56, 0.56, 0.56)),
+        Material::Lambertian(Vec3::new(0.04, 0.67, 0.72)),
     )));
+
     world.add(Box::new(Triangle::new(
-                Vec3::new(0.0, 0.0, -0.5),
-                Vec3::new(0.0, 0.5, 0.0),
-                Vec3::new(0.5, 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 0.5),
+                Vec3::new(0.0, 0.5, 0.5),
+                Vec3::new(0.5, 0.0, 0.5),
                 Material::Lambertian(Vec3::new(1.0, 0.0, 0.0)))));
+
     world.add(Box::new(Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
+        Vec3::new(1.0, 0.0, 0.0),
         0.5,
         Material::Metal(Vec3::new(0.8, 0.6, 0.2), 0.0),
     )));
+
     world.add(Box::new(Sphere::new(
-        Vec3::new(1.0, 0.0, -1.0),
+        Vec3::new(-1.0, 0.0, 0.0),
         0.5,
         Material::Dielectric(Vec3::new(1.0, 1.0, 1.0), 1.5),
     )));
@@ -115,13 +119,13 @@ fn main() {
     let mut imgbuf = image::ImageBuffer::new(dim_x, dim_y);
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         let mut col = vector::Vec3::new(0.0, 0.0, 0.0);
+        println!("x: {}", x);
+        println!("y: {}", y);
 
         // Sample a set number of times to determine color
         for _ in 0..num_samples {
-            let r_x: f32 = rng.gen_range(0.0, 1.0);
-            let r_y: f32 = rng.gen_range(0.0, 1.0);
-            let u = (x as f32 + r_x) / dim_x as f32;
-            let v = (y as f32 + r_y) / dim_y as f32;
+            let u = (x as f32 + rng.gen_range(0.0, 1.0)) / (dim_x as f32);
+            let v = (y as f32 + rng.gen_range(0.0, 1.0)) / (dim_y as f32);
 
             let ray = &cam.get_ray(u, v);
             col = col + color(&ray, &world, depth);

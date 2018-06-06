@@ -137,7 +137,7 @@ impl Vec3 {
 
     // Calculates the Euclidean length
     pub fn length(&self) -> f32 {
-        (self.squared_length()).sqrt()
+        self.squared_length().sqrt()
     }
 
     pub fn reflect(&self, b: Vec3) -> Vec3 {
@@ -145,8 +145,8 @@ impl Vec3 {
         self.clone() - r
     }
 
-    pub fn set_y(&mut self, y: f32) {
-        self.y = y
+    pub fn set_x(&mut self, x: f32) {
+        self.x = x
     }
 
     pub fn squared_length(&self) -> f32 {
