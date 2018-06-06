@@ -16,7 +16,7 @@ impl HitableList {
         HitableList { objs }
     }
 
-    pub fn add(&mut self, obj: Box<Hitable>) {
+    pub fn push(&mut self, obj: Box<Hitable>) {
         self.objs.push(obj);
     }
 

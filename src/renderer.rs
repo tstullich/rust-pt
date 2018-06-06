@@ -1,3 +1,5 @@
+extern crate indicatif;
+
 use camera::Camera;
 use hitable::HitRecord;
 use hitable_list::HitableList;
@@ -5,6 +7,7 @@ use rand::{thread_rng, Rng};
 use ray::Ray;
 use vector::Vec3;
 
+use self::indicatif::{ProgressBar, ProgressStyle};
 use std::f32;
 
 pub struct Renderer {
@@ -19,9 +22,16 @@ impl Renderer {
     pub fn render(&self, dim_x: u32, dim_y: u32, world: &HitableList) -> Vec<u8> {
         // Options pertaining to the actual path tracing
         let depth: u32 = 0;
-        let num_samples: u16 = 32;
+        let num_samples: u16 = 16;
         let mut rng = thread_rng();
-        let mut pixels: Vec<u8> = Vec::with_capacity(dim_y as usize * dim_x as usize * 3);
+        let mut pixels: Vec<u8> = Vec::with_capacity(dim_x as usize * dim_y as usize * 3);
+        let progress_bar = ProgressBar::new(dim_x as u64 * dim_y as u64);
+        progress_bar.set_message("Rendered Pixels");
+        progress_bar.set_style(
+            ProgressStyle::default_bar()
+                .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
+                .progress_chars("##-"),
+        );
         for y in (0..dim_y).rev() {
             for x in 0..dim_x {
                 let mut col = Vec3::new(0.0, 0.0, 0.0);
@@ -47,8 +57,12 @@ impl Renderer {
                 pixels.push(ir);
                 pixels.push(ig);
                 pixels.push(ib);
+
+                progress_bar.inc(1);
             }
         }
+        progress_bar.finish();
+
         pixels
     }
 
