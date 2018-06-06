@@ -1,4 +1,4 @@
-extern crate image;
+extern crate png;
 extern crate rand;
 
 mod camera;
@@ -12,6 +12,7 @@ mod vector;
 
 use hitable::HitRecord;
 use material::Material;
+use png::HasParameters;
 use rand::{thread_rng, Rng};
 use ray::Ray;
 use sphere::Sphere;
@@ -114,36 +115,45 @@ fn main() {
 
     // Options pertaining to the actual path tracing
     let depth: u32 = 0;
-    let num_samples: u16 = 16;
+    let num_samples: u16 = 32;
     let mut rng = thread_rng();
-    let mut imgbuf = image::ImageBuffer::new(dim_x, dim_y);
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let mut col = vector::Vec3::new(0.0, 0.0, 0.0);
-        println!("x: {}", x);
-        println!("y: {}", y);
+    let mut pixels: Vec<u8> = Vec::with_capacity(dim_y as usize * dim_x as usize * 3);
+    for y in (0..dim_y).rev() {
+        for x in 0..dim_x {
+            let mut col = vector::Vec3::new(0.0, 0.0, 0.0);
 
-        // Sample a set number of times to determine color
-        for _ in 0..num_samples {
-            let u = (x as f32 + rng.gen_range(0.0, 1.0)) / (dim_x as f32);
-            let v = (y as f32 + rng.gen_range(0.0, 1.0)) / (dim_y as f32);
+            // Sample a set number of times to determine color
+            for _ in 0..num_samples {
+                let u = (x as f32 + rng.gen_range(0.0, 1.0)) / (dim_x as f32);
+                let v = (y as f32 + rng.gen_range(0.0, 1.0)) / (dim_y as f32);
 
-            let ray = &cam.get_ray(u, v);
-            col = col + color(&ray, &world, depth);
+                let ray = &cam.get_ray(u, v);
+                col = col + color(&ray, &world, depth);
+            }
+
+            // Apply antialising by taking average of samples
+            col = col / (num_samples as f32);
+
+            // Apply some gamme correction
+            col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());
+
+            let ir = (255.99 * col.x()) as u8;
+            let ig = (255.99 * col.y()) as u8;
+            let ib = (255.99 * col.z()) as u8;
+            pixels.push(ir);
+            pixels.push(ig);
+            pixels.push(ib);
         }
-
-        // Apply antialising by taking average of samples
-        col = col / (num_samples as f32);
-
-        // Apply some gamme correction
-        col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());
-
-        let ir = (255.99 * col.x()) as u8;
-        let ig = (255.99 * col.y()) as u8;
-        let ib = (255.99 * col.z()) as u8;
-
-        *pixel = image::Rgb([ir, ig, ib]);
     }
 
     let path = std::path::Path::new("test.png");
-    image::ImageRgb8(imgbuf).save(path).unwrap();
+    let file = std::fs::File::create(path).unwrap();
+    let ref mut w = std::io::BufWriter::new(file);
+
+    let mut encoder = png::Encoder::new(w, dim_x, dim_y);
+    encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
+
+    let mut writer = encoder.write_header().unwrap();
+    writer.write_image_data(&pixels).unwrap();
+    println!("Image written to {:?}", path);
 }
