@@ -19,20 +19,20 @@ impl Hitable for Triangle {
         let a = edge1.dot(&h);
 
         if a > -epsilon && a < epsilon {
-            return None
+            return None;
         }
 
         let f = 1.0 / a;
         let s = r.origin() - self.v0;
         let u = f * (s.dot(&h));
         if u < 0.0 || u > 1.0 {
-            return None
+            return None;
         }
 
         let q = s.cross(&edge1);
         let v = f * r.direction().dot(&q);
         if v < 0.0 || u + v > 1.0 {
-            return None
+            return None;
         }
 
         let t = f * edge2.dot(&q);
@@ -41,7 +41,7 @@ impl Hitable for Triangle {
             record.p = r.point_at_t(t);
             record.normal = self.normal();
             record.material = self.material;
-            return Some(record)
+            return Some(record);
         }
 
         // There is a line intersection but not a ray intersection
@@ -52,7 +52,12 @@ impl Hitable for Triangle {
 
 impl Triangle {
     pub fn new(v0: Vec3, v1: Vec3, v2: Vec3, material: Material) -> Triangle {
-        Triangle { v0, v1, v2, material }
+        Triangle {
+            v0,
+            v1,
+            v2,
+            material,
+        }
     }
 
     fn normal(&self) -> Vec3 {

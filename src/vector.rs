@@ -145,10 +145,6 @@ impl Vec3 {
         self.clone() - r
     }
 
-    pub fn set_x(&mut self, x: f32) {
-        self.x = x
-    }
-
     pub fn squared_length(&self) -> f32 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }

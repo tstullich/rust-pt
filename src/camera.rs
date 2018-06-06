@@ -38,8 +38,8 @@ impl Camera {
         let u = Vec3::unit_vec(vup.cross(&w));
         let v = w.cross(&u);
 
-        let lower_left_corner =
-            lookfrom - (u * half_width * focus_dist) - (v * half_height * focus_dist) - (w * focus_dist);
+        let lower_left_corner = lookfrom - (u * half_width * focus_dist)
+            - (v * half_height * focus_dist) - (w * focus_dist);
         let horizontal = u * half_width * focus_dist * 2.0;
         let vertical = v * half_height * focus_dist * 2.0;
 
