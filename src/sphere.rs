@@ -28,7 +28,7 @@ impl Hitable for Sphere {
             let mut record = HitRecord::new();
             if t_min < temp && temp < t_max {
                 record.t = temp;
-                record.p = r.point_at_t(record.t);
+                record.p = r.point_at_t(temp);
                 record.normal = (record.p - self.position) / self.radius;
                 record.material = self.material;
                 return Some(record);
@@ -36,7 +36,7 @@ impl Hitable for Sphere {
             temp = (-b + sqt) / a;
             if t_min < temp && temp < t_max {
                 record.t = temp;
-                record.p = r.point_at_t(record.t);
+                record.p = r.point_at_t(temp);
                 record.normal = (record.p - self.position) / self.radius;
                 record.material = self.material;
                 return Some(record);

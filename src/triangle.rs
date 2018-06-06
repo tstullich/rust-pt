@@ -37,12 +37,15 @@ impl Hitable for Triangle {
 
         let t = f * edge2.dot(&q);
         if t_min < t && t < t_max {
-            let record = HitRecord::new();
+            let mut record = HitRecord::new();
             record.p = r.point_at_t(t);
-            record.normal = (record.p - self.position) / self.radius;
+            record.normal = self.normal();
             record.material = self.material;
+            return Some(record)
         }
 
+        // There is a line intersection but not a ray intersection
+        // according to the wikipedia page of the Moeller-Trumbore algorithm
         None
     }
 }
@@ -50,5 +53,16 @@ impl Hitable for Triangle {
 impl Triangle {
     pub fn new(v0: Vec3, v1: Vec3, v2: Vec3, material: Material) -> Triangle {
         Triangle { v0, v1, v2, material }
+    }
+
+    fn normal(&self) -> Vec3 {
+        let u = self.v1 - self.v0;
+        let v = self.v2 - self.v0;
+
+        let normal_x = (u.y() * v.z()) - (u.z() * v.y());
+        let normal_y = (u.z() * v.x()) - (u.x() * v.z());
+        let normal_z = (u.x() * v.y()) - (u.y() * v.x());
+
+        Vec3::new(normal_x, normal_y, normal_z)
     }
 }

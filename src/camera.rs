@@ -31,14 +31,15 @@ impl Camera {
         let theta = vertical_fov * f32::consts::PI / 180.0;
         let half_height = (theta / 2.0).tan();
         let half_width = aspect * half_height;
-
         let origin = lookfrom;
+
+        // Find orthonormal basis for camera directions
         let w = Vec3::unit_vec(lookfrom - lookat);
         let u = Vec3::unit_vec(vup.cross(&w));
         let v = w.cross(&u);
 
         let lower_left_corner =
-            origin - (u * half_width * focus_dist) - (v * half_height * focus_dist) - (w * focus_dist);
+            lookfrom - (u * half_width * focus_dist) - (v * half_height * focus_dist) - (w * focus_dist);
         let horizontal = u * half_width * focus_dist * 2.0;
         let vertical = v * half_height * focus_dist * 2.0;
 
@@ -70,18 +71,8 @@ impl Camera {
     pub fn get_ray(&self, s: f32, t: f32) -> Ray {
         let rd = self.random_unit_in_disk() * self.lens_radius;
         let offset = self.u * rd.x() + self.v * rd.y();
-        let mut direction = self.lower_left_corner + (self.horizontal * s) + (self.vertical * t)
+        let direction = self.lower_left_corner + (self.horizontal * s) + (self.vertical * t)
             - self.origin - offset;
-        // TODO Find a way to get around having to do this. Seems a bit hacky
-        // Flipping the directions of the x and y coordinate since we write
-        // into our output buffer starting from the top left corner of our
-        // image and not from the bottom left
-        //println!("Direction before: {:?}", direction);
-        //let x = direction.x();
-        //let y = direction.y();
-        //direction.set_x(x * -1.0);
-        //direction.set_y(y * -1.0);
-        //println!("Direction after: {:?}", direction);
         Ray::new(self.origin + offset, direction)
     }
 }

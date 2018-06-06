@@ -15,6 +15,7 @@ use material::Material;
 use rand::{thread_rng, Rng};
 use ray::Ray;
 use sphere::Sphere;
+use triangle::Triangle;
 use vector::Vec3;
 
 // Computes the next ray based on the material that the Hitable object posseses
@@ -58,17 +59,21 @@ fn color(r: &Ray, world: &hitable_list::HitableList, depth: u32) -> Vec3 {
 fn main() {
     // Final output settings
     let dim_x: u32 = 1200;
-    let dim_y: u32 = 500;
+    let dim_y: u32 = 800;
 
     // Camera setup
-    let lookfrom = Vec3::new(3.0, 3.0, 2.0);
+    // TODO Find a way to get around having to do this. Seems a bit hacky
+    // Flipping the directions of the x and y coordinate since we write
+    // into our output buffer starting from the top left corner of our
+    // image and not from the bottom left
+    let lookfrom = Vec3::new(-4.0, 2.0, 10.0);
     let lookat = Vec3::new(0.0, 0.0, -1.0);
     let dist_to_focus = (lookfrom - lookat).length();
-    let aperture = 0.2;
+    let aperture = 0.1;
     let cam = camera::Camera::new(
         lookfrom,
         lookat,
-        Vec3::new(0.0, 1.0, 0.0),
+        Vec3::new(0.0, -1.0, 0.0),
         20.0,
         (dim_x / dim_y) as f32,
         aperture,
@@ -87,13 +92,18 @@ fn main() {
         100.0,
         Material::Lambertian(Vec3::new(0.56, 0.56, 0.56)),
     )));
+    world.add(Box::new(Triangle::new(
+                Vec3::new(0.0, 0.0, -0.5),
+                Vec3::new(0.0, 0.5, 0.0),
+                Vec3::new(0.5, 0.0, 0.0),
+                Material::Lambertian(Vec3::new(1.0, 0.0, 0.0)))));
     world.add(Box::new(Sphere::new(
-        Vec3::new(1.0, 0.0, -1.0),
+        Vec3::new(-1.0, 0.0, -1.0),
         0.5,
         Material::Metal(Vec3::new(0.8, 0.6, 0.2), 0.0),
     )));
     world.add(Box::new(Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
+        Vec3::new(1.0, 0.0, -1.0),
         0.5,
         Material::Dielectric(Vec3::new(1.0, 1.0, 1.0), 1.5),
     )));

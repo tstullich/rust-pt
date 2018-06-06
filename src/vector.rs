@@ -126,7 +126,7 @@ impl Vec3 {
     pub fn cross(&self, b: &Vec3) -> Vec3 {
         Vec3 {
             x: self.y * b.z - self.z * b.y,
-            y: self.z * b.x - self.x * b.z,
+            y: -(self.x * b.z - self.z * b.x),
             z: self.x * b.y - self.y * b.x,
         }
     }
@@ -137,12 +137,16 @@ impl Vec3 {
 
     // Calculates the Euclidean length
     pub fn length(&self) -> f32 {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+        (self.squared_length()).sqrt()
     }
 
     pub fn reflect(&self, b: Vec3) -> Vec3 {
         let r = b * (self.dot(&b) * 2.0);
         self.clone() - r
+    }
+
+    pub fn set_y(&mut self, y: f32) {
+        self.y = y
     }
 
     pub fn squared_length(&self) -> f32 {
