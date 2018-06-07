@@ -32,15 +32,13 @@ impl Parser {
         let mut vector_table: Vec<Vec3> = Vec::new();
         for line in lines {
             let mut split = line.split_whitespace();
-            let start = split.next();
-            if start == Some("v") {
+            let start_symbol = split.next();
+            if start_symbol == Some("v") {
                 let new_vec = Vec3::new(split.next().unwrap().parse::<f32>().unwrap(),
                                         split.next().unwrap().parse::<f32>().unwrap(),
                                         split.next().unwrap().parse::<f32>().unwrap());
                 vector_table.push(new_vec);
-            }
-
-            if start == Some("f") {
+            } else if start_symbol == Some("f") {
                 let triangle = Triangle::new(vector_table[split.next().unwrap().parse::<usize>().unwrap() - 1],
                                              vector_table[split.next().unwrap().parse::<usize>().unwrap() - 1],
                                              vector_table[split.next().unwrap().parse::<usize>().unwrap() - 1],
