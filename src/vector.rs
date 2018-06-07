@@ -24,6 +24,18 @@ impl ops::Add for Vec3 {
     }
 }
 
+impl ops::Add<Vec3> for f32 {
+    type Output = Vec3;
+
+    fn add(self, other: Vec3) -> Vec3 {
+        Vec3 {
+            x: self + other.x,
+            y: self + other.y,
+            z: self + other.z,
+        }
+    }
+}
+
 /*
  * Function to divide one vector with another
  */
@@ -60,6 +72,22 @@ impl ops::Div<f32> for Vec3 {
     }
 }
 
+impl ops::Index<usize> for Vec3 {
+    type Output = f32;
+
+    fn index(&self, i: usize) -> &f32 {
+        if i == 0 {
+            &self.x
+        } else if i == 1 {
+            &self.y
+        } else if i == 2 {
+            &self.z
+        } else {
+            panic!("Invalid index for Vec3");
+        }
+    }
+}
+
 impl ops::Mul<Vec3> for Vec3 {
     type Output = Vec3;
 
@@ -72,10 +100,18 @@ impl ops::Mul<Vec3> for Vec3 {
     }
 }
 
-/*
- * TODO Make this a binary operator so
- * we can do <scalar> * <Vec3> or <Vec3> * <scalar>
- */
+impl ops::Mul<Vec3> for f32 {
+    type Output = Vec3;
+
+    fn mul(self, other: Vec3) -> Vec3 {
+        Vec3 {
+            x: self * other.x,
+            y: self * other.y,
+            z: self * other.z,
+        }
+    }
+}
+
 impl ops::Mul<f32> for Vec3 {
     type Output = Vec3;
 
@@ -84,6 +120,18 @@ impl ops::Mul<f32> for Vec3 {
             x: self.x * scalar,
             y: self.y * scalar,
             z: self.z * scalar,
+        }
+    }
+}
+
+impl ops::Neg for Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Vec3 {
+        Vec3 {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
         }
     }
 }

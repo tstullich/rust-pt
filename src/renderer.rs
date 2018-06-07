@@ -1,12 +1,14 @@
 extern crate indicatif;
+extern crate rand;
+extern crate rayon;
 
 use camera::Camera;
 use hitable::HitRecord;
 use hitable_list::HitableList;
-use rand::{thread_rng, Rng};
 use ray::Ray;
 use vector::Vec3;
 
+use renderer::rayon::prelude::*;
 use self::indicatif::{ProgressBar, ProgressStyle};
 use std::f32;
 
@@ -23,23 +25,22 @@ impl Renderer {
         // Options pertaining to the actual path tracing
         let depth: u32 = 0;
         let num_samples: u16 = 16;
-        let mut rng = thread_rng();
         let mut pixels: Vec<u8> = Vec::with_capacity(dim_x as usize * dim_y as usize * 3);
-        let progress_bar = ProgressBar::new(dim_x as u64 * dim_y as u64);
+        let progress_bar = &Box::new(ProgressBar::new(dim_x as u64 * dim_y as u64));
         progress_bar.set_message("Rendered Pixels");
         progress_bar.set_style(
             ProgressStyle::default_bar()
                 .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
                 .progress_chars("##-"),
         );
-        for y in (0..dim_y).rev() {
-            for x in 0..dim_x {
+
+        let pixels = (0..dim_y).into_par_iter().rev().flat_map(|y| (0..dim_x).into_par_iter().flat_map(move |x| {
                 let mut col = Vec3::new(0.0, 0.0, 0.0);
 
                 // Sample a set number of times to determine color
                 for _ in 0..num_samples {
-                    let u = (x as f32 + rng.gen_range(0.0, 1.0)) / (dim_x as f32);
-                    let v = (y as f32 + rng.gen_range(0.0, 1.0)) / (dim_y as f32);
+                    let u = (x as f32 + rand::random::<f32>()) / (dim_x as f32);
+                    let v = (y as f32 + rand::random::<f32>()) / (dim_y as f32);
 
                     let ray = &self.camera.get_ray(u, v);
                     col = col + self.color(&ray, world, depth);
@@ -51,16 +52,10 @@ impl Renderer {
                 // Apply some gamme correction
                 col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());
 
-                let ir = (255.99 * col.x()) as u8;
-                let ig = (255.99 * col.y()) as u8;
-                let ib = (255.99 * col.z()) as u8;
-                pixels.push(ir);
-                pixels.push(ig);
-                pixels.push(ib);
-
                 progress_bar.inc(1);
-            }
-        }
+                (0..3).into_par_iter().map(move |k| (255.99 * col[k as usize]).min(255.0) as u8)
+
+        })).collect();
         progress_bar.finish();
 
         pixels
@@ -100,6 +95,6 @@ impl Renderer {
 
         let unit_direction = Vec3::unit_vec(r.direction());
         let t: f32 = (unit_direction.y() + 1.0) * 0.5;
-        Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
+        Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + t * Vec3::new(0.5, 0.7, 1.0)
     }
 }
