@@ -8,8 +8,8 @@ use hitable_list::HitableList;
 use ray::Ray;
 use vector::Vec3;
 
-use renderer::rayon::prelude::*;
 use self::indicatif::{ProgressBar, ProgressStyle};
+use renderer::rayon::prelude::*;
 use std::f32;
 
 pub struct Renderer {
@@ -25,7 +25,6 @@ impl Renderer {
         // Options pertaining to the actual path tracing
         let depth: u32 = 0;
         let num_samples: u16 = 16;
-        let mut pixels: Vec<u8> = Vec::with_capacity(dim_x as usize * dim_y as usize * 3);
         let progress_bar = &Box::new(ProgressBar::new(dim_x as u64 * dim_y as u64));
         progress_bar.set_message("Rendered Pixels");
         progress_bar.set_style(
@@ -34,28 +33,35 @@ impl Renderer {
                 .progress_chars("##-"),
         );
 
-        let pixels = (0..dim_y).into_par_iter().rev().flat_map(|y| (0..dim_x).into_par_iter().flat_map(move |x| {
-                let mut col = Vec3::new(0.0, 0.0, 0.0);
+        let pixels = (0..dim_y)
+            .into_par_iter()
+            .rev()
+            .flat_map(|y| {
+                (0..dim_x).into_par_iter().flat_map(move |x| {
+                    let mut col = Vec3::new(0.0, 0.0, 0.0);
 
-                // Sample a set number of times to determine color
-                for _ in 0..num_samples {
-                    let u = (x as f32 + rand::random::<f32>()) / (dim_x as f32);
-                    let v = (y as f32 + rand::random::<f32>()) / (dim_y as f32);
+                    // Sample a set number of times to determine color
+                    for _ in 0..num_samples {
+                        let u = (x as f32 + rand::random::<f32>()) / (dim_x as f32);
+                        let v = (y as f32 + rand::random::<f32>()) / (dim_y as f32);
 
-                    let ray = &self.camera.get_ray(u, v);
-                    col = col + self.color(&ray, world, depth);
-                }
+                        let ray = &self.camera.get_ray(u, v);
+                        col = col + self.color(&ray, world, depth);
+                    }
 
-                // Apply antialising by taking average of samples
-                col = col / (num_samples as f32);
+                    // Apply antialising by taking average of samples
+                    col = col / (num_samples as f32);
 
-                // Apply some gamme correction
-                col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());
+                    // Apply some gamme correction
+                    col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());
 
-                progress_bar.inc(1);
-                (0..3).into_par_iter().map(move |k| (255.99 * col[k as usize]).min(255.0) as u8)
-
-        })).collect();
+                    progress_bar.inc(1);
+                    (0..3)
+                        .into_par_iter()
+                        .map(move |k| (255.99 * col[k as usize]).min(255.0) as u8)
+                })
+            })
+            .collect();
         progress_bar.finish();
 
         pixels
