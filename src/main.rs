@@ -6,6 +6,7 @@ mod camera;
 mod hitable;
 mod hitable_list;
 mod material;
+mod parser;
 mod ray;
 mod renderer;
 mod sphere;
@@ -15,6 +16,7 @@ mod vector;
 use clap::{App, Arg};
 use hitable_list::HitableList;
 use material::Material;
+use parser::Parser;
 use png::HasParameters;
 use rand::{thread_rng, Rng};
 use sphere::Sphere;
@@ -27,6 +29,14 @@ fn main() {
         .version("0.1")
         .author("Tim Stullich")
         .about("A simple raytracer written in Rust")
+        .arg(
+            Arg::with_name("file")
+                .short("f")
+                .long("file")
+                .value_name("FILE")
+                .help("An OBJ format file to render")
+                .takes_value(true),
+        )
         .arg(
             Arg::with_name("width")
                 .short("w")
@@ -56,6 +66,9 @@ fn main() {
     // Final output settings
     let width = matches.value_of("width").unwrap_or("1200").parse::<u32>().unwrap();
     let height = matches.value_of("height").unwrap_or("800").parse::<u32>().unwrap();
+
+    let parser = Parser::OBJ(String::from("obj-data/octahedron.obj"));
+    parser.parse();
 
     // Camera setup
     let lookfrom = Vec3::new(0.0, 2.0, 4.0);
