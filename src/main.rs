@@ -3,6 +3,7 @@ extern crate png;
 extern crate rand;
 
 mod camera;
+mod face;
 mod hitable;
 mod hitable_list;
 mod material;
@@ -67,11 +68,16 @@ fn main() {
     let width = matches.value_of("width").unwrap_or("1200").parse::<u32>().unwrap();
     let height = matches.value_of("height").unwrap_or("800").parse::<u32>().unwrap();
 
-    let parser = Parser::OBJ(String::from("obj-data/octahedron.obj"));
-    parser.parse();
+    let world = if matches.value_of("file").is_some() {
+        // Create our scene and add some geometry
+        Parser::OBJ(String::from(matches.value_of("file").unwrap())).parse()
+    } else {
+        // No OBJ file provided. Create random world
+        random_world()
+    };
 
     // Camera setup
-    let lookfrom = Vec3::new(0.0, 2.0, 4.0);
+    let lookfrom = Vec3::new(1.0, 2.0, 10.0);
     let lookat = Vec3::new(0.0, 0.0, 0.0);
     let dist_to_focus = (lookfrom - lookat).length();
     let cam = camera::Camera::new(
@@ -84,17 +90,7 @@ fn main() {
         dist_to_focus,
     );
 
-    // Create our scene and add some geometry
-    let mut world = hitable_list::HitableList::new();
-    world.push(Box::new(Triangle::new(
-        Vec3::new(-0.5, 0.0, 0.5),
-        Vec3::new(0.0, 0.5, 0.5),
-        Vec3::new(0.5, 0.0, 0.5),
-        Material::Lambertian(Vec3::new(1.0, 0.0, 0.0)),
-    )));
-
     let renderer = renderer::Renderer::new(cam);
-    //let world = random_world();
     let pixels = renderer.render(width, height, &world);
 
     let path = std::path::Path::new("test.png");
