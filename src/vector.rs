@@ -188,8 +188,8 @@ impl Vec3 {
         self.squared_length().sqrt()
     }
 
-    pub fn reflect(&self, b: Vec3) -> Vec3 {
-        let r = b * (self.dot(&b) * 2.0);
+    pub fn reflect(&self, normal: Vec3) -> Vec3 {
+        let r = normal * (self.dot(&normal) * 2.0);
         self.clone() - r
     }
 
@@ -212,4 +212,44 @@ impl Vec3 {
     pub fn z(&self) -> f32 {
         self.z
     }
+}
+
+#[test]
+fn test_arithmetic() {
+    let v1 = Vec3::new(1.0, 0.0, 1.0);
+    let v2 = Vec3::new(1.0, 1.0, 1.0);
+    assert_eq!(v1 - v2, Vec3::new(0.0, -1.0, 0.0));
+    assert_eq!(v1 * v2, Vec3::new(1.0, 0.0, 1.0));
+    assert_eq!(v1 + v2, Vec3::new(2.0, 1.0, 2.0));
+    assert_eq!(v1 / v2, Vec3::new(1.0, 0.0, 1.0));
+
+    // Scalar arithmetic
+    assert_eq!(3.0 * v1, Vec3::new(3.0, 0.0, 3.0));
+    assert_eq!(3.0 + v1, Vec3::new(4.0, 3.0, 4.0));
+
+    // Sign change
+    assert_eq!(-v1, Vec3::new(-1.0, 0.0, -1.0));
+
+    // Indexing
+    let v3 = Vec3::new(1.0, 2.0, 3.0);
+    assert_eq!(v3[0], 1.0);
+    assert_eq!(v3[1], 2.0);
+    assert_eq!(v3[2], 3.0);
+}
+
+#[test]
+fn test_functionality() {
+    let v1 = Vec3::new(1.0, 0.0, 1.0);
+    let v2 = Vec3::new(1.0, 1.0, 1.0);
+
+    // Dot product
+    assert_eq!(v1.dot(&v2), 2.0);
+
+    // Cross product
+    assert_eq!(v1.cross(&v2), Vec3::new(-1.0, 0.0, 1.0));
+
+    // Lengths
+    assert_eq!(v1.length(), 1.4142135);
+    assert_eq!(v2.squared_length(), 3.0);
+    assert_eq!(Vec3::unit_vec(v1), Vec3::new(0.70710677, 0.0, 0.70710677));
 }
