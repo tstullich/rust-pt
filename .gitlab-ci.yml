@@ -1,16 +1,35 @@
-.cargo_test_template: &cargo_test
+.cargo_plain_test: &cargo_test
   stage: test
   script:
     - cargo test --verbose --jobs 1
 
-stable:cargo:
-  image: rustdocker/rust:stable
-  <<: *cargo_test
+.cargo_coverage_test: &cargo_coverage_test
+  stage: test
+  script:
+    - cargo test --verbose --jobs 1
+  after_script:
+    - wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
+    - tar xzf master.tar.gz &&
+    - cd kcov-master &&
+    - mkdir build &&
+    - cd build &&
+    - cmake .. &&
+    - make &&
+    - make install DESTDIR=../../kcov-build &&
+    - cd ../.. &&
+    - rm -rf kcov-master &&
+    - for file in target/debug/examplerust-*[^\.d]; do mkdir -p "target/cov/$(basename $file)"; ./kcov-build/usr/local/bin/kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
+    - bash <(curl -s https://codecov.io/bash) &&
+    - echo "Uploaded code coverage"
 
-beta:cargo:
+rust:stable:
+  image: rustdocker/rust:stable
+  <<: *cargo_coverage_test
+
+rust:beta:
   image: rustdocker/rust:beta
   <<: *cargo_test
 
-nightly:cargo:
+rust:nightly:
   image: rustdocker/rust:nightly
   <<: *cargo_test
