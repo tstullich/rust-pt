@@ -8,7 +8,7 @@
   script:
     - cargo test --verbose --jobs 1
     - echo "kcov dir $(which kcov)"
-    - for file in target/debug/pathtracer-*[^\.d]; do mkdir -p "target/cov/$(basename $file)"; kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
+    - for file in target/debug/pathtracer-*[^\.d]; do mkdir -p "target/cov/$(basename $file)"; kcov --exclude-pattern=/.cargo,/usr/lib "$file"; done &&
     - bash <(curl -s https://codecov.io/bash) -t 755e455c-14e8-4aeb-aded-f15272b6d352 &&
     - echo "Uploaded code coverage"
 
