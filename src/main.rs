@@ -3,7 +3,6 @@ extern crate png;
 extern crate rand;
 
 mod camera;
-mod face;
 mod hitable;
 mod hitable_list;
 mod material;
@@ -65,8 +64,16 @@ fn main() {
         .get_matches();
 
     // Final output settings
-    let width = matches.value_of("width").unwrap_or("1200").parse::<u32>().unwrap();
-    let height = matches.value_of("height").unwrap_or("800").parse::<u32>().unwrap();
+    let width = matches
+        .value_of("width")
+        .unwrap_or("1200")
+        .parse::<u32>()
+        .unwrap();
+    let height = matches
+        .value_of("height")
+        .unwrap_or("800")
+        .parse::<u32>()
+        .unwrap();
 
     let world = if matches.value_of("file").is_some() {
         // Create our scene and add some geometry
