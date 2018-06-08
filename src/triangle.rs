@@ -64,10 +64,23 @@ impl Triangle {
         let u = self.v1 - self.v0;
         let v = self.v2 - self.v0;
 
-        let normal_x = (u.y() * v.z()) - (u.z() * v.y());
-        let normal_y = (u.z() * v.x()) - (u.x() * v.z());
-        let normal_z = (u.x() * v.y()) - (u.y() * v.x());
-
-        Vec3::new(normal_x, normal_y, normal_z)
+        Vec3::new(
+            (u.y() * v.z()) - (u.z() * v.y()),
+            (u.z() * v.x()) - (u.x() * v.z()),
+            (u.x() * v.y()) - (u.y() * v.x()),
+        )
     }
+}
+
+#[test]
+fn test_norm() {
+    let triangle = Triangle::new(
+        Vec3::new(1.0, 0.0, 0.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        Vec3::new(0.0, 0.0, 1.0),
+        Material::Lambertian(Vec3::new(1.0, 1.0, 1.0)),
+    );
+
+    let norm = triangle.normal();
+    assert_eq!(norm, Vec3::new(1.0, 1.0, 1.0));
 }
