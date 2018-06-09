@@ -40,6 +40,7 @@ after_success: |
   cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCAL .. && make &&
   make install && cd ../.. &&
 
-  kcov --coveralls-id=$TRAVIS_JOB_ID \
+  kcov --verify \
+       --coveralls-id=$TRAVIS_JOB_ID \
        --exclude-pattern=/.cargo \
        target/kcov target/debug/$PKGNAME-*
