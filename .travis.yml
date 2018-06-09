@@ -34,9 +34,8 @@ script:
     - cargo test --verbose --jobs 1
 
 after_success: |
-    export RUSTFLAGS="-C link-dead-code"
+    RUSTFLAGS="-C link-dead-code"
     TEST_FILES=$(cargo test 2>&1 >/dev/null | awk '/^     Running target\/debug\// { print $2 }')
-
     wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
     tar xzf master.tar.gz &&
     cd kcov-master &&
