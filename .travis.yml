@@ -48,5 +48,5 @@ after_success: |
     cd ../.. &&
     rm -rf kcov-master &&
     for file in target/debug/$PKGNAME-*[^\.d]; do mkdir -p "target/cov/$(basename $file)"; $KCOV --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
-    $KCOV --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo,/usr/lib target/cov target/debug/$PKGNAME-* &&
+    $KCOV --merge --coveralls-id=$TRAVIS_JOB_ID --verify target/cov target/cov/pathtracer-0e9b03fdb361c846/pathtracer-*.* target/cov/pathtracer-0e9b03fdb361c846/pathtracer-*.* &&
     echo "Uploaded code coverage"
