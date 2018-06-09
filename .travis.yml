@@ -1,5 +1,11 @@
 language: rust
 
+# A workaround due to the Meltdown exploit
+# If this can be removed in the future
+# that would be amazing since this will
+# increase queue times for builds
+sudo: required
+
 rust:
     - stable
     - beta
