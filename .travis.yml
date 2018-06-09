@@ -6,8 +6,8 @@ rust:
     - nightly
 
 before_script: |
-  PKGNAME="pathtracer" # must match with cargo.toml
-  LOCAL="~/.local" # install here to avoid `sudo`
+  PKGNAME="pathtracer"
+  LOCAL="~/.local"
   export PATH=$LOCAL/bin:$PATH
 
 addons:
@@ -16,7 +16,7 @@ addons:
     - libcurl4-openssl-dev
     - libelf-dev
     - libdw-dev
-    - libbfd-dev 
+    - binutils-dev
 
 matrix:
     allow_failures:
