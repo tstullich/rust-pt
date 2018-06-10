@@ -31,20 +31,32 @@ impl Parser {
         let mut list = HitableList::new();
         let mut vector_table: Vec<Vec3> = Vec::new();
         for line in lines {
-            let mut split = line.split_whitespace();
-            let start_symbol = split.next();
-            if start_symbol == Some("v") {
+            if line.starts_with("v ") {
+                let split: Vec<&str> = line.split_whitespace().skip(1).collect();
                 let new_vec = Vec3::new(
-                    split.next().unwrap().parse::<f32>().unwrap(),
-                    split.next().unwrap().parse::<f32>().unwrap(),
-                    split.next().unwrap().parse::<f32>().unwrap(),
+                    split[0].parse::<f32>().unwrap(),
+                    split[1].parse::<f32>().unwrap(),
+                    split[2].parse::<f32>().unwrap(),
                 );
                 vector_table.push(new_vec);
-            } else if start_symbol == Some("f") {
+            } else if line.starts_with("f") {
+                // Only going to parse out the vertex indices for now
+                // TODO Support parsing of vertex normals and texture coordinates
+                let split: Vec<&str> = line[2..line.len()]
+                    .split(" ")
+                    .map(|group| {
+                        if group.contains("/") {
+                            &group[..group.find("/").unwrap()]
+                        } else {
+                            group
+                        }
+                    })
+                    .collect();
+
                 let triangle = Triangle::new(
-                    vector_table[split.next().unwrap().parse::<usize>().unwrap() - 1],
-                    vector_table[split.next().unwrap().parse::<usize>().unwrap() - 1],
-                    vector_table[split.next().unwrap().parse::<usize>().unwrap() - 1],
+                    vector_table[split[0].parse::<usize>().unwrap() - 1],
+                    vector_table[split[1].parse::<usize>().unwrap() - 1],
+                    vector_table[split[2].parse::<usize>().unwrap() - 1],
                     Material::Lambertian(Vec3::new(1.0, 0.0, 0.0)),
                 );
                 list.push(Box::new(triangle));

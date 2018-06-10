@@ -6,9 +6,7 @@ language: rust
 # increase queue times for builds
 sudo: required
 
-rust:
-    - beta
-    - nightly
+language: rust
 
 before_script: |
   PKGNAME="pathtracer"
@@ -24,10 +22,11 @@ addons:
     - libiberty-dev
 
 matrix:
+    fast_finish: true
     include:
+        - rust: beta
         - rust: stable
         - env: RUSTFLAGS="-C link-dead-code"
-    fast_finish: true
     allow_failures:
         - rust: nightly
 
