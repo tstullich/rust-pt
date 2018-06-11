@@ -65,3 +65,11 @@ impl Parser {
         list
     }
 }
+
+#[test]
+fn test_parse() {
+    let parsed = Parser::OBJ(String::from("obj-data/african_head.obj")).parse();
+    // Hardcoded the number of attributes in our test file
+    // Maybe there is a better way to test this in case the file changes
+    assert_eq!(parsed.len(), 2492);
+}

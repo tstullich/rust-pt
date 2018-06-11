@@ -1,5 +1,8 @@
 use hitable::{HitRecord, Hitable};
+use material::Material;
 use ray::Ray;
+use sphere::Sphere;
+use vector::Vec3;
 
 pub struct HitableList {
     objs: Vec<Box<Hitable>>,
@@ -38,4 +41,23 @@ impl HitableList {
         }
         temp_rec
     }
+
+    pub fn len(&self) -> usize {
+        self.objs.len()
+    }
+}
+
+#[test]
+#[ignore] // TODO Do not ignore and fix test!
+fn test_intersection() {
+    let mut list = HitableList::new();
+    list.push(Box::new(Sphere::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        1.0,
+        Material::Lambertian(Vec3::new(0.0, 0.0, 0.0)),
+    )));
+
+    // Setting up a ray that is in front of the sphere going directly into it
+    let ray = Ray::new(Vec3::new(0.0, 0.0, 5.0), Vec3::new(0.0, 0.0, 0.0));
+    assert!(list.intersect(&ray, 0.0001, 10.0).is_some());
 }
