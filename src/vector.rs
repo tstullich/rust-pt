@@ -1,4 +1,4 @@
-use std::{cmp, ops};
+use std::{cmp, ops, panic};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vec3 {
@@ -223,9 +223,10 @@ fn test_arithmetic() {
     assert_eq!(v1 + v2, Vec3::new(2.0, 1.0, 2.0));
     assert_eq!(v1 / v2, Vec3::new(1.0, 0.0, 1.0));
 
-    // Scalar arithmetic
+    // Scalar operations
     assert_eq!(3.0 * v1, Vec3::new(3.0, 0.0, 3.0));
     assert_eq!(3.0 + v1, Vec3::new(4.0, 3.0, 4.0));
+    assert_eq!(v1 - 3.0, Vec3::new(-2.0, -3.0, -2.0));
 
     // Sign change
     assert_eq!(-v1, Vec3::new(-1.0, 0.0, -1.0));
@@ -235,6 +236,26 @@ fn test_arithmetic() {
     assert_eq!(v3[0], 1.0);
     assert_eq!(v3[1], 2.0);
     assert_eq!(v3[2], 3.0);
+}
+
+#[test]
+fn test_undefined() {
+    // Going to walk through some undefined behavior
+    // scenarios and catch the panics that should be thrown
+    let v1 = Vec3::new(1.0, 1.0, 1.0);
+
+    // Dividing a vector with scalar 0 should panic
+    let result = panic::catch_unwind(|| v1 / 0.0);
+    assert!(result.is_err());
+
+    // Dividing a vector which has a 0 component should panic
+    // Will need to check if this is expected behavior though
+    let result = panic::catch_unwind(|| v1 / Vec3::new(0.0, 0.0, 0.0));
+    assert!(result.is_err());
+
+    // Trying to index a value that is not not part of our 3-component vector
+    let result = panic::catch_unwind(|| v1[3]);
+    assert!(result.is_err());
 }
 
 #[test]

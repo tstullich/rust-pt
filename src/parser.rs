@@ -72,4 +72,7 @@ fn test_parse() {
     // Hardcoded the number of attributes in our test file
     // Maybe there is a better way to test this in case the file changes
     assert_eq!(parsed.len(), 2492);
+
+    let parsed = Parser::OBJ(String::from("obj-data/gourd.obj")).parse();
+    assert_eq!(parsed.len(), 648);
 }
