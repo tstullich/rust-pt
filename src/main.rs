@@ -19,7 +19,7 @@ use material::Material;
 use parser::Parser;
 use png::HasParameters;
 use rand::{thread_rng, Rng};
-use sphere::Sphere;
+use sphere::{MovingSphere, Sphere};
 use triangle::Triangle;
 use vector::Vec3;
 
@@ -84,17 +84,19 @@ fn main() {
     };
 
     // Camera setup
-    let lookfrom = Vec3::new(1.0, 2.0, 10.0);
+    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
     let lookat = Vec3::new(0.0, 0.0, 0.0);
-    let dist_to_focus = (lookfrom - lookat).length();
+    let dist_to_focus = 10.0;
     let cam = camera::Camera::new(
         lookfrom,
         lookat,
         Vec3::new(0.0, 1.0, 0.0),
         30.0,
         (width / height) as f32,
-        0.1,
+        0.0,
         dist_to_focus,
+        0.0,
+        1.0,
     );
 
     let renderer = renderer::Renderer::new(cam);
@@ -130,8 +132,11 @@ fn random_world() -> HitableList {
             );
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if mat_type < 0.8 {
-                    world.push(Box::new(Sphere::new(
+                    world.push(Box::new(MovingSphere::new(
                         center,
+                        center + Vec3::new(0.0, 0.5 * rng.gen_range(0.0, 1.0), 0.0),
+                        0.0,
+                        1.0,
                         0.2,
                         Material::Lambertian(Vec3::new(
                             rng.gen_range(0.0, 1.0) * rng.gen_range(0.0, 1.0),

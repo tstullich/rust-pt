@@ -2,6 +2,8 @@ extern crate indicatif;
 extern crate rand;
 extern crate rayon;
 
+use std::f32;
+
 use camera::Camera;
 use hitable::HitRecord;
 use hitable_list::HitableList;
@@ -10,7 +12,6 @@ use vector::Vec3;
 
 use self::indicatif::{ProgressBar, ProgressStyle};
 use renderer::rayon::prelude::*;
-use std::f32;
 
 pub struct Renderer {
     camera: Camera,

@@ -1,7 +1,7 @@
 use hitable::{HitRecord, Hitable};
 use material::Material;
 use ray::Ray;
-use sphere::Sphere;
+use sphere::{MovingSphere, Sphere};
 use vector::Vec3;
 
 pub struct HitableList {
@@ -57,10 +57,28 @@ fn test_intersection() {
     )));
 
     // Setting up a ray that is in front of the sphere going directly into it
-    let ray = Ray::new(Vec3::new(0.0, 0.0, 5.0), Vec3::new(0.0, 0.0, -1.0));
+    let ray = Ray::new(Vec3::new(0.0, 0.0, 5.0), Vec3::new(0.0, 0.0, -1.0), 0.0);
     assert!(list.intersect(&ray, 0.001, 10.0).is_some());
 
     // Setting up a ray that is not going to hit the sphere
-    let ray = Ray::new(Vec3::new(0.0, 0.0, 5.0), Vec3::new(0.0, 5.0, 0.0));
+    let ray = Ray::new(Vec3::new(0.0, 0.0, 5.0), Vec3::new(0.0, 5.0, 0.0), 0.0);
+    assert!(list.intersect(&ray, 0.001, 10.0).is_none());
+
+    // Going to test the same thing with a MovingSphere
+    list.objs.clear();
+
+    list.push(Box::new(MovingSphere::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, 0.0),
+        0.0,
+        1.0,
+        1.0,
+        Material::Lambertian(Vec3::new(0.0, 0.0, 0.0)),
+    )));
+
+    let ray = Ray::new(Vec3::new(0.0, 0.0, 5.0), Vec3::new(0.0, 0.0, -1.0), 0.0);
+    assert!(list.intersect(&ray, 0.001, 10.0).is_some());
+
+    let ray = Ray::new(Vec3::new(0.0, 0.0, 5.0), Vec3::new(0.0, 5.0, 0.0), 0.0);
     assert!(list.intersect(&ray, 0.001, 10.0).is_none());
 }

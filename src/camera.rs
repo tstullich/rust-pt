@@ -1,3 +1,5 @@
+extern crate rand;
+
 use rand::{thread_rng, Rng};
 use ray::Ray;
 use std::f32;
@@ -12,6 +14,8 @@ pub struct Camera {
     u: Vec3,
     v: Vec3,
     lens_radius: f32,
+    time0: f32,
+    time1: f32,
 }
 
 /*
@@ -27,6 +31,8 @@ impl Camera {
         aspect: f32,
         aperture: f32,
         focus_dist: f32,
+        time0: f32,
+        time1: f32,
     ) -> Camera {
         let lens_radius = aperture / 2.0;
         let theta = vertical_fov * f32::consts::PI / 180.0;
@@ -54,6 +60,8 @@ impl Camera {
             u,
             v,
             lens_radius,
+            time0,
+            time1,
         }
     }
 
@@ -77,7 +85,8 @@ impl Camera {
         let direction = self.lower_left_corner + (self.horizontal * s) + (self.vertical * t)
             - self.origin
             - offset;
-        Ray::new(self.origin + offset, direction)
+        let time = self.time0 + rand::random::<f32>() * (self.time1 - self.time0);
+        Ray::new(self.origin + offset, direction, time)
     }
 }
 
@@ -96,6 +105,8 @@ fn test_create() {
         (width / height) as f32,
         0.1,
         dist_to_focus,
+        0.0,
+        0.1,
     );
 
     assert_eq!(

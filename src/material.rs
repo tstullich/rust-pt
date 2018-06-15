@@ -23,7 +23,7 @@ impl Material {
      */
     pub fn scatter(&self, ray: &Ray, rec: &HitRecord) -> Option<Ray> {
         match &self {
-            Material::Lambertian(_) => self.lambertian(rec),
+            Material::Lambertian(_) => self.lambertian(ray, rec),
             Material::Metal(_, fuzz) => {
                 // Going to check if fuzz was properly set
                 // and give it an upper bound of 1.0
@@ -37,9 +37,9 @@ impl Material {
     /*
      * Scatter function for a Lambertian diffuse surface.
      */
-    fn lambertian(&self, rec: &HitRecord) -> Option<Ray> {
+    fn lambertian(&self, ray: &Ray, rec: &HitRecord) -> Option<Ray> {
         let target = rec.p + rec.normal + self.random_unit_in_sphere();
-        Some(Ray::new(rec.p, target - rec.p))
+        Some(Ray::new(rec.p, target - rec.p, ray.time()))
     }
 
     /*
@@ -51,7 +51,7 @@ impl Material {
     fn metal(&self, ray: &Ray, fuzz: f32, rec: &HitRecord) -> Option<Ray> {
         let reflected = Vec3::unit_vec(ray.direction()).reflect(rec.normal);
         let fuzzed_reflector = reflected + self.random_unit_in_sphere() * fuzz;
-        let scattered = Ray::new(rec.p, fuzzed_reflector);
+        let scattered = Ray::new(rec.p, fuzzed_reflector, ray.time());
 
         return if scattered.direction().dot(&rec.normal) > 0.0 {
             Some(scattered)
@@ -84,9 +84,9 @@ impl Material {
 
         let mut rng = thread_rng();
         if rng.gen_range(0.0, 1.0) < reflect_prob {
-            Some(Ray::new(rec.p, reflected))
+            Some(Ray::new(rec.p, reflected, ray.time()))
         } else {
-            Some(Ray::new(rec.p, refracted.unwrap()))
+            Some(Ray::new(rec.p, refracted.unwrap(), ray.time()))
         }
     }
 
