@@ -7,6 +7,7 @@ pub struct Triangle {
     v0: Vec3,
     v1: Vec3,
     v2: Vec3,
+    normal: Vec3,
     material: Material,
 }
 
@@ -52,23 +53,25 @@ impl Hitable for Triangle {
 
 impl Triangle {
     pub fn new(v0: Vec3, v1: Vec3, v2: Vec3, material: Material) -> Triangle {
+        let u = v1 - v0;
+        let v = v2 - v0;
+        let normal = Vec3::new(
+            (u.y() * v.z()) - (u.z() * v.y()),
+            (u.z() * v.x()) - (u.x() * v.z()),
+            (u.x() * v.y()) - (u.y() * v.x()),
+        );
+
         Triangle {
             v0,
             v1,
             v2,
+            normal,
             material,
         }
     }
 
     fn normal(&self) -> Vec3 {
-        let u = self.v1 - self.v0;
-        let v = self.v2 - self.v0;
-
-        Vec3::new(
-            (u.y() * v.z()) - (u.z() * v.y()),
-            (u.z() * v.x()) - (u.x() * v.z()),
-            (u.x() * v.y()) - (u.y() * v.x()),
-        )
+        self.normal
     }
 }
 
