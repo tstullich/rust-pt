@@ -7,7 +7,9 @@ use std::f32;
 use camera::Camera;
 use hitable::HitRecord;
 use hitable_list::HitableList;
+use material::Material;
 use ray::Ray;
+use sphere::Sphere;
 use vector::Vec3;
 
 use self::indicatif::{ProgressBar, ProgressStyle};
@@ -104,4 +106,38 @@ impl Renderer {
         let t: f32 = (unit_direction.y() + 1.0) * 0.5;
         Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + t * Vec3::new(0.5, 0.7, 1.0)
     }
+}
+
+#[test]
+fn test_hit() {
+    // Camera setup
+    let width = 100;
+    let height = 100;
+    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
+    let lookat = Vec3::new(0.0, 0.0, 0.0);
+    let dist_to_focus = 10.0;
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        Vec3::new(0.0, 1.0, 0.0),
+        30.0,
+        (width / height) as f32,
+        0.0,
+        dist_to_focus,
+        0.0,
+        1.0,
+    );
+
+    // Add a single sphere
+    let mut world = HitableList::new();
+    world.push(Box::new(Sphere::new(
+        Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Material::Lambertian(Vec3::new(0.5, 0.4, 0.5)),
+    )));
+
+    // See if the renderer runs
+    let renderer = Renderer::new(cam);
+    let pixels = renderer.render(width, height, &world);
+    assert!(!pixels.is_empty());
 }
