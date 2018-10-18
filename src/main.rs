@@ -2,6 +2,7 @@ extern crate clap;
 extern crate png;
 extern crate rand;
 
+mod aabb;
 mod camera;
 mod hitable;
 mod hitable_list;

@@ -1,3 +1,4 @@
+use aabb::AABB;
 use hitable::{HitRecord, Hitable};
 use material::Material;
 use ray::Ray;
@@ -43,6 +44,11 @@ impl Hitable for Sphere {
             }
         }
         None
+    }
+
+    fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB> {
+        Some(AABB::new(self.position - Vec3::new(self.radius, self.radius, self.radius)), self.position +
+             Vec3::new(self.radius, self.radius, self.radius))
     }
 }
 
