@@ -140,3 +140,10 @@ impl Material {
         }
     }
 }
+
+#[test]
+fn test_materials() {
+    let mat = Material::Lambertian(Vec3::new(1.0, 0.0, 0.0));
+    let v = mat.random_unit_in_sphere();
+    assert!(v.squared_length() < 1.0);
+}
