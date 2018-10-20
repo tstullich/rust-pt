@@ -70,7 +70,7 @@ impl Renderer {
         pixels
     }
 
-    // Computes the next ray based on the material that the Hitable object posseses
+    // Computes the next ray based on the material that the Hitable object possesses
     // We could theoretically move this back into the color() function. I might
     // go ahead and do that later
     fn compute_scatter_ray(&self, intersected: &HitRecord, r: &Ray) -> Option<Ray> {

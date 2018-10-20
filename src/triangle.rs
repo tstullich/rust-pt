@@ -1,3 +1,4 @@
+use aabb::AABB;
 use hitable::{HitRecord, Hitable};
 use material::Material;
 use ray::Ray;
@@ -47,6 +48,12 @@ impl Hitable for Triangle {
 
         // There is a line intersection but not a ray intersection
         // according to the wikipedia page of the Moeller-Trumbore algorithm
+        None
+    }
+
+    fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB> {
+        // TODO Implement this
+        println!("Not implemented yet");
         None
     }
 }

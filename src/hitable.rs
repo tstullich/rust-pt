@@ -5,7 +5,7 @@ use vector::Vec3;
 
 pub trait Hitable: Sync {
     fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
-    fn bounding_box(t0: f32, t1: f32) -> Option<AABB>;
+    fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB>;
 }
 
 /*

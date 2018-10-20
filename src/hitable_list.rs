@@ -1,3 +1,4 @@
+use aabb::AABB;
 use hitable::{HitRecord, Hitable};
 use material::Material;
 use ray::Ray;
@@ -44,6 +45,27 @@ impl HitableList {
 
     pub fn len(&self) -> usize {
         self.objs.len()
+    }
+
+    pub fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB> {
+        if self.objs.len() < 1 {
+            return None;
+        }
+        let mut bb = self.objs[0].bounding_box(t0, t1);
+
+        if bb.is_none() {
+            return None;
+        }
+
+        for i in 1..self.objs.len() {
+            if self.objs[0].bounding_box(t0, t1).is_some() {
+                bb = AABB::surrounding_box
+            } else {
+                return None;
+            }
+        }
+
+        return Some
     }
 }
 

@@ -8,10 +8,7 @@ pub struct AABB {
 
 impl AABB {
     pub fn new(a: Vec3, b: Vec3) -> AABB {
-        AABB {
-            min: a,
-            max: b,
-        }
+        AABB { min: a, max: b }
     }
 
     pub fn min(&self) -> Vec3 {
@@ -41,9 +38,25 @@ impl AABB {
             tmax = t1.min(tmax);
 
             if tmax <= tmin {
-                return false
+                return false;
             }
         }
         true
+    }
+
+    pub fn surrounding_box(&self, box0: AABB, box1: AABB) -> AABB {
+        let small = Vec3::new(
+            box0.min().x().min(box1.min().x()),
+            box0.min().y().min(box1.min().y()),
+            box0.min().z().min(box1.min().z()),
+        );
+
+        let big = Vec3::new(
+            box0.max().x().max(box1.max().x()),
+            box0.max().y().max(box1.max().y()),
+            box0.max().z().max(box1.max().z()),
+        );
+
+        AABB::new(small, big)
     }
 }
