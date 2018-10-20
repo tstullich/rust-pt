@@ -1,9 +1,6 @@
 use aabb::AABB;
 use hitable::{HitRecord, Hitable};
-use material::Material;
 use ray::Ray;
-use sphere::{MovingSphere, Sphere};
-use vector::Vec3;
 
 pub struct HitableList {
     objs: Vec<Box<Hitable>>,
@@ -51,21 +48,29 @@ impl HitableList {
         if self.objs.len() < 1 {
             return None;
         }
-        let mut bb = self.objs[0].bounding_box(t0, t1);
+        let first_true = self.objs[0].bounding_box(t0, t1);
+
+        let mut bb = if first_true.is_none() {
+            None
+        } else {
+            first_true
+        };
 
         if bb.is_none() {
-            return None;
+            return bb
         }
 
+        // TODO Check this for correctness at some point
         for i in 1..self.objs.len() {
-            if self.objs[0].bounding_box(t0, t1).is_some() {
-                bb = AABB::surrounding_box
+            let temp = self.objs[0].bounding_box(t0, t1);
+            if temp.is_some() {
+                bb = Some(AABB::surrounding_box(bb.unwrap(), temp.unwrap()));
             } else {
                 return None;
             }
         }
 
-        return Some
+        return bb;
     }
 }
 

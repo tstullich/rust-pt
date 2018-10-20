@@ -3,6 +3,7 @@ extern crate png;
 extern crate rand;
 
 mod aabb;
+mod bvh_node;
 mod camera;
 mod hitable;
 mod hitable_list;
