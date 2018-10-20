@@ -8,4 +8,4 @@ I am hoping to iterate over it from time-to-time and build out some more feature
 
 # Examples
 Below I am going to post some example pictures. These are some of many configurable scenes.
-![Example Scene 1](https://imgur.com/a/CQdP1Aq)
+![Example Scene 1](https://i.imgur.com/MTrlL1I.jpg)
