@@ -1,6 +1,9 @@
 use aabb::AABB;
 use hitable::{HitRecord, Hitable};
+use material::Material;
+use sphere::{MovingSphere, Sphere};
 use ray::Ray;
+use vector::Vec3;
 
 pub struct HitableList {
     objs: Vec<Box<Hitable>>,

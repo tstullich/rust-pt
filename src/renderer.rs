@@ -7,7 +7,9 @@ use std::f32;
 use camera::Camera;
 use hitable::HitRecord;
 use hitable_list::HitableList;
+use material::Material;
 use ray::Ray;
+use sphere::Sphere;
 use vector::Vec3;
 
 use self::indicatif::{ProgressBar, ProgressStyle};
