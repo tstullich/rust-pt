@@ -3,9 +3,15 @@ extern crate rand;
 use aabb::AABB;
 use hitable::{HitRecord, Hitable};
 use hitable_list::HitableList;
-use rand::{thread_rng, Rng};
+use rand::Rng;
 use ray::Ray;
+use std::cmp::Ordering;
 
+/// A class that encapsulates a bounding volume hierarchy
+/// Using this class the render should see a significant
+/// speedup when performing raycasts, by only considering
+/// objects that are contained and intersect a given
+/// volumes bounding box
 pub struct BvhNode {
     left: Box<Hitable>,
     right: Box<Hitable>,
@@ -24,6 +30,8 @@ impl Hitable for BvhNode {
                 let left_rec = left_hit.unwrap();
                 let right_rec = right_hit.unwrap();
                 if left_rec.t < right_rec.t {
+                    // The left record is closer than the right one so we
+                    // should prefer it
                     return Some(left_rec);
                 } else {
                     return Some(right_rec);
@@ -46,16 +54,66 @@ impl Hitable for BvhNode {
 }
 
 impl BvhNode {
-    //pub fn new(l: HitableList, n: i32, time0: f32, time1: f32) -> BvhNode {
-    //    let mut rng = rand::thread_rng();
-    //    let axis = rng.gen_range(0, 3);
+    pub fn new(l: HitableList, n: i32, time0: f32, time1: f32) -> BvhNode {
+        let mut rng = rand::thread_rng();
 
-    //    if axis == 0 {
-    //    } else if axis == 1{
-    //    } else {
-    //    }
-    //}
+        // Randomly choose the x, y, or z axis to sort the hitable list over
+        l.objs
+            .sort_by(|a, b| BvhNode::sort(*a, *b, rng.gen_range(0, 3)).unwrap());
 
-    fn sort_x(&self) {
+        let (_left, _right) = if n == 1 {
+            (l.objs[0], l.objs[0])
+        } else if n == 2 {
+            (l.objs[0], l.objs[1])
+        } else {
+            (
+                BvhNode::new(l, n / 2, time0, time1),
+                BvhNode::new(&l.objs[0..n / 2], n - n / 2, time0, time1),
+            )
+        };
+
+        let box_left = _left.bounding_box(0.0, 0.0);
+        let box_right = _right.bounding_box(0.0, 0.0);
+
+        if box_left.is_none() || box_right.is_none() {
+            panic!("No bounding box in the constructor!");
+        }
+
+        let _bb = AABB::surrounding_box(box_left, box_right);
+
+        BvhNode {
+            left: _left,
+            right: _right,
+            bb: _bb,
+        }
+    }
+
+    fn sort(a: Box<Hitable>, b: Box<Hitable>, axis: i32) -> Option<Ordering> {
+        let box_left = a.bounding_box(0.0, 0.0);
+        let box_right = b.bounding_box(0.0, 0.0);
+
+        if box_left.is_none() || box_right.is_none() {
+            panic!("No bounding box in the constructor!");
+        }
+
+        return if axis == 0 {
+            box_left
+                .unwrap()
+                .min()
+                .x()
+                .partial_cmp(&box_right.unwrap().min().x())
+        } else if axis == 1 {
+            box_left
+                .unwrap()
+                .min()
+                .y()
+                .partial_cmp(&box_right.unwrap().min().y())
+        } else {
+            box_left
+                .unwrap()
+                .min()
+                .z()
+                .partial_cmp(&box_right.unwrap().min().z())
+        };
     }
 }

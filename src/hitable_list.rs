@@ -1,19 +1,17 @@
 use aabb::AABB;
 use hitable::{HitRecord, Hitable};
 use material::Material;
-use sphere::{MovingSphere, Sphere};
 use ray::Ray;
+use sphere::{MovingSphere, Sphere};
 use vector::Vec3;
 
 pub struct HitableList {
-    objs: Vec<Box<Hitable>>,
+    pub objs: Vec<Box<Hitable>>,
 }
 
-/*
- * A list that holds our intersectable objects. I tried to make
- * this as generic as possible for now but I am sure I can make this
- * better once I know more about Rust
- */
+/// A list that holds our intersectable objects. I tried to make
+/// this as generic as possible for now but I am sure I can make this
+/// better once I know more about Rust
 impl HitableList {
     pub fn new() -> HitableList {
         let objs: Vec<Box<Hitable>> = Vec::new();
@@ -24,9 +22,7 @@ impl HitableList {
         self.objs.push(obj);
     }
 
-    /*
-     * A function to find the object that is closest to the current view point
-     */
+    /// A function to find the object that is closest to the current view point
     pub fn intersect(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut temp_rec = None;
         let mut closest_so_far = t_max;
@@ -47,6 +43,8 @@ impl HitableList {
         self.objs.len()
     }
 
+    /// New bounding box construction test. Will need to see if this
+    /// adaptation works correctly
     pub fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB> {
         if self.objs.len() < 1 {
             return None;
@@ -60,7 +58,7 @@ impl HitableList {
         };
 
         if bb.is_none() {
-            return bb
+            return bb;
         }
 
         // TODO Check this for correctness at some point
