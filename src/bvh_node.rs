@@ -54,6 +54,12 @@ impl Hitable for BvhNode {
 }
 
 impl BvhNode {
+    /// The constructor method for the BVH tree. The idea here is that
+    /// we randomly choose an axis to sort our hitable objects and then
+    /// split the list in half. One half will be assigned to the left
+    /// of a bounding box and vice versa. Then a recursive call is made
+    /// and we try to continously split our box into smaller box until
+    /// we terminate at a given n
     pub fn new(l: HitableList, n: i32, time0: f32, time1: f32) -> BvhNode {
         let mut rng = rand::thread_rng();
 
@@ -68,7 +74,7 @@ impl BvhNode {
         } else {
             (
                 BvhNode::new(l, n / 2, time0, time1),
-                BvhNode::new(&l.objs[0..n / 2], n - n / 2, time0, time1),
+                BvhNode::new(&l.objs[n / 2..l.objs.len()], n - n / 2, time0, time1),
             )
         };
 
@@ -88,6 +94,8 @@ impl BvhNode {
         }
     }
 
+    /// A function to sort our hitable objects. It is based on a partial
+    /// ordering of our x/y/z values for two given hitables.
     fn sort(a: Box<Hitable>, b: Box<Hitable>, axis: i32) -> Option<Ordering> {
         let box_left = a.bounding_box(0.0, 0.0);
         let box_right = b.bounding_box(0.0, 0.0);
