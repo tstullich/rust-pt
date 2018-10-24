@@ -12,6 +12,7 @@ mod parser;
 mod ray;
 mod renderer;
 mod sphere;
+mod texture;
 mod triangle;
 mod vector;
 

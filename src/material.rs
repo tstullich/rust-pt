@@ -1,26 +1,26 @@
 use hitable::HitRecord;
+use texture::Texture;
 use rand::{thread_rng, Rng};
 use ray::Ray;
 use vector::Vec3;
 
 #[derive(Copy, Clone)]
 pub enum Material {
-    Lambertian(Vec3),
+    Lambertian(Texture),
     Metal(Vec3, f32),
     Dielectric(Vec3, f32),
 }
 
 impl Material {
-    /* A generalized scatter function based on the type of material
-     * that is specified for the surface. Currently there are three
-     * options available are:
-     * 1. Lambertian diffuse surface
-     * 2. Metal surface with a tune-able fuzzy factor
-     * 3. Dielectric surfaces with specular reflection
-     * The return type of Option<Ray> allows us to indicate if ray was
-     * reflected or not. In case of the metal material, the light might
-     * not be reflected
-     */
+    /// A generalized scatter function based on the type of material
+    /// that is specified for the surface. Currently there are three
+    /// options available are:
+    /// 1. Lambertian diffuse surface
+    /// 2. Metal surface with a tune-able fuzzy factor
+    /// 3. Dielectric surfaces with specular reflection
+    /// The return type of Option<Ray> allows us to indicate if ray was
+    /// reflected or not. In case of the metal material, the light might
+    /// not be reflected
     pub fn scatter(&self, ray: &Ray, rec: &HitRecord) -> Option<Ray> {
         match &self {
             Material::Lambertian(_) => self.lambertian(ray, rec),
@@ -34,20 +34,16 @@ impl Material {
         }
     }
 
-    /*
-     * Scatter function for a Lambertian diffuse surface.
-     */
+    /// Scatter function for a Lambertian diffuse surface.
     fn lambertian(&self, ray: &Ray, rec: &HitRecord) -> Option<Ray> {
         let target = rec.p + rec.normal + self.random_unit_in_sphere();
         Some(Ray::new(rec.p, target - rec.p, ray.time()))
     }
 
-    /*
-     * Scatter function for a metal surface. We are able to adjust
-     * the "roughess" of the surface through a fuzzy factor that
-     * makes it so the surface scatters more light and the reflection
-     * starts to become more diffuse.
-     */
+    /// Scatter function for a metal surface. We are able to adjust
+    /// the "roughess" of the surface through a fuzzy factor that
+    /// makes it so the surface scatters more light and the reflection
+    /// starts to become more diffuse.
     fn metal(&self, ray: &Ray, fuzz: f32, rec: &HitRecord) -> Option<Ray> {
         let reflected = Vec3::unit_vec(ray.direction()).reflect(rec.normal);
         let fuzzed_reflector = reflected + self.random_unit_in_sphere() * fuzz;
@@ -60,7 +56,7 @@ impl Material {
         };
     }
 
-    // Calculates the next outgoing ray for a dielectric surface.
+    /// Calculates the next outgoing ray for a dielectric surface.
     fn dielectric(&self, ref_idx: f32, ray: &Ray, rec: &HitRecord) -> Option<Ray> {
         let reflected = ray.direction().reflect(rec.normal);
         let (outward_normal, ni_over_nt, cosine) = if ray.direction().dot(&rec.normal) > 0.0 {
@@ -90,10 +86,8 @@ impl Material {
         }
     }
 
-    /*
-     * This is used in the diffuse and metal surface reflection calculations
-     * to find a new random vector to reflect to
-     */
+    /// This is used in the diffuse and metal surface reflection calculations
+    /// to find a new random vector to reflect to
     fn random_unit_in_sphere(&self) -> Vec3 {
         let mut rng = thread_rng();
         let mut p = Vec3::new(
@@ -112,7 +106,7 @@ impl Material {
         p
     }
 
-    // Calculates the refraction angle if we are using a dielectric material
+    /// Calculates the refraction angle if we are using a dielectric material
     fn refract(&self, v: &Vec3, normal: &Vec3, ni_over_nt: f32) -> Option<Vec3> {
         let uv = Vec3::unit_vec(*v);
         let dt = uv.dot(normal);
@@ -125,7 +119,7 @@ impl Material {
         };
     }
 
-    // Calculates the Fresnel factor in a specular reflection
+    /// Calculates the Fresnel factor in a specular reflection
     fn schlick(&self, cosine: f32, ref_idx: f32) -> f32 {
         let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
         r0 *= r0;
@@ -134,7 +128,7 @@ impl Material {
 
     pub fn color(self) -> Vec3 {
         match self {
-            Material::Lambertian(color) => color,
+            Material::Lambertian(texture) => texture.value(0.0, 0.0, Vec3::new(0.0, 0.0, 0.0)),
             Material::Metal(color, _) => color,
             Material::Dielectric(color, _) => color,
         }

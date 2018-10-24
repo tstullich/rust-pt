@@ -11,11 +11,10 @@ pub trait Hitable: Sync {
 }
 
 impl fmt::Debug for Hitable {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-      write!(f, "Hitable {{ aabb: {:?} }}", self.bounding_box())
-  }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Hitable {{ aabb: {:?} }}", self.bounding_box())
+    }
 }
-
 
 /// A data structure that holds some info about the object that was
 /// intersected in the scene
