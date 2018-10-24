@@ -49,7 +49,7 @@ impl HitableList {
         if self.objs.len() < 1 {
             return None;
         }
-        let first_true = self.objs[0].bounding_box(t0, t1);
+        let first_true = self.objs[0].bounding_box();
 
         let mut bb = if first_true.is_none() {
             None
@@ -63,9 +63,9 @@ impl HitableList {
 
         // TODO Check this for correctness at some point
         for i in 1..self.objs.len() {
-            let temp = self.objs[0].bounding_box(t0, t1);
+            let temp = self.objs[0].bounding_box();
             if temp.is_some() {
-                bb = Some(AABB::surrounding_box(bb.unwrap(), temp.unwrap()));
+                bb = Some(AABB::surrounding_box(&bb.unwrap(), &temp.unwrap()));
             } else {
                 return None;
             }

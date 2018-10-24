@@ -51,10 +51,9 @@ impl Hitable for Triangle {
         None
     }
 
-    fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<AABB> {
         // TODO Implement this
-        println!("Not implemented yet");
-        None
+        panic!("Not implemented yet");
     }
 }
 
