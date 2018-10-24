@@ -1,7 +1,7 @@
 use ray::Ray;
 use vector::Vec3;
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct AABB {
     min: Vec3,
     max: Vec3,

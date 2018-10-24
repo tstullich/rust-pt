@@ -8,7 +8,6 @@ pub trait Hitable: Sync {
     fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB>;
 }
 
-
 /// A data structure that holds some info about the object that was
 /// intersected in the scene
 pub struct HitRecord {

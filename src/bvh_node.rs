@@ -60,22 +60,27 @@ impl BvhNode {
     /// of a bounding box and vice versa. Then a recursive call is made
     /// and we try to continously split our box into smaller box until
     /// we terminate at a given n
-    pub fn new(l: HitableList, n: i32, time0: f32, time1: f32) -> BvhNode {
+    pub fn new(l: &mut [Box<Hitable>], n: i32, time0: f32, time1: f32) -> BvhNode {
         let mut rng = rand::thread_rng();
 
         // Randomly choose the x, y, or z axis to sort the hitable list over
-        l.objs
-            .sort_by(|a, b| BvhNode::sort(*a, *b, rng.gen_range(0, 3)).unwrap());
+        l.sort_by(|ref a, ref b| BvhNode::sort(a, b, rng.gen_range(0, 3)).unwrap());
 
         let (_left, _right) = if n == 1 {
-            (l.objs[0], l.objs[0])
+            (l[0], l[0])
         } else if n == 2 {
-            (l.objs[0], l.objs[1])
+            (l[0], l[1])
         } else {
-            (
-                BvhNode::new(l, n / 2, time0, time1),
-                BvhNode::new(&l.objs[n / 2..l.objs.len()], n - n / 2, time0, time1),
-            )
+            // This is pretty ugly. I wonder if there is a better way to do this
+            let left_node: Box<Hitable> = Box::new(BvhNode::new(l, n / 2, time0, time1));
+            let len = l.len();
+            let right_node: Box<Hitable> = Box::new(BvhNode::new(
+                &mut l[n as usize / 2..len],
+                n - n / 2,
+                time0,
+                time1,
+            ));
+            (left_node, right_node)
         };
 
         let box_left = _left.bounding_box(0.0, 0.0);
@@ -85,7 +90,7 @@ impl BvhNode {
             panic!("No bounding box in the constructor!");
         }
 
-        let _bb = AABB::surrounding_box(box_left, box_right);
+        let _bb = AABB::surrounding_box(box_left.unwrap(), box_right.unwrap());
 
         BvhNode {
             left: _left,
@@ -96,7 +101,7 @@ impl BvhNode {
 
     /// A function to sort our hitable objects. It is based on a partial
     /// ordering of our x/y/z values for two given hitables.
-    fn sort(a: Box<Hitable>, b: Box<Hitable>, axis: i32) -> Option<Ordering> {
+    fn sort(a: &Box<Hitable>, b: &Box<Hitable>, axis: i32) -> Option<Ordering> {
         let box_left = a.bounding_box(0.0, 0.0);
         let box_right = b.bounding_box(0.0, 0.0);
 
