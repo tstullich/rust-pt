@@ -1,119 +1,206 @@
 extern crate rand;
-
-use aabb::AABB;
-use hitable::{HitRecord, Hitable};
-use hitable_list::HitableList;
 use rand::Rng;
-use ray::Ray;
+use std::fmt;
 use std::cmp::Ordering;
 
-/// A class that encapsulates a bounding volume hierarchy
-/// Using this class the render should see a significant
-/// speedup when performing raycasts, by only considering
-/// objects that are contained and intersect a given
-/// volumes bounding box
-pub struct BvhNode {
-    left: Box<Hitable>,
-    right: Box<Hitable>,
-    bb: AABB,
+use aabb::AABB;
+use ray::Ray;
+use hitable::{Hitable, HitRecord};
+
+#[derive(Debug)]
+pub struct BvhTree<'a> {
+  nodes: Vec<BvhNode<'a>>,
+  root: NodeId
 }
 
-impl Hitable for BvhNode {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
-        // This if/else structure seems pretty messy.
-        // Maybe this can be cleaned up a bit
-        if self.bb.hit(ray, t_min, t_max) {
-            let left_hit = self.left.hit(ray, t_min, t_max);
-            let right_hit = self.right.hit(ray, t_min, t_max);
-
-            if left_hit.is_some() && right_hit.is_some() {
-                let left_rec = left_hit.unwrap();
-                let right_rec = right_hit.unwrap();
-                if left_rec.t < right_rec.t {
-                    // The left record is closer than the right one so we
-                    // should prefer it
-                    return Some(left_rec);
-                } else {
-                    return Some(right_rec);
-                }
-            } else if left_hit.is_some() {
-                return Some(left_hit.unwrap());
-            } else if right_hit.is_some() {
-                return Some(right_hit.unwrap());
-            } else {
-                return None;
-            }
-        }
-        None
-    }
-
-    fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB> {
-        // Going to make a simple copy here
-        Some(self.bb.clone())
-    }
+#[derive(Debug)]
+struct BvhNode<'a> {
+  left: Option<NodeId>,
+  right: Option<NodeId>,
+  aabb: Option<AABB>,
+  hitable: Option<&'a Box<Hitable>>
 }
 
-impl BvhNode {
-    pub fn new(l: HitableList, n: i32, time0: f32, time1: f32) -> BvhNode {
-        let mut rng = rand::thread_rng();
-
-        // Randomly choose the x, y, or z axis to sort the hitable list over
-        l.objs
-            .sort_by(|a, b| BvhNode::sort(*a, *b, rng.gen_range(0, 3)).unwrap());
-
-        let (_left, _right) = if n == 1 {
-            (l.objs[0], l.objs[0])
-        } else if n == 2 {
-            (l.objs[0], l.objs[1])
-        } else {
-            (
-                BvhNode::new(l, n / 2, time0, time1),
-                BvhNode::new(&l.objs[0..n / 2], n - n / 2, time0, time1),
-            )
-        };
-
-        let box_left = _left.bounding_box(0.0, 0.0);
-        let box_right = _right.bounding_box(0.0, 0.0);
-
-        if box_left.is_none() || box_right.is_none() {
-            panic!("No bounding box in the constructor!");
-        }
-
-        let _bb = AABB::surrounding_box(box_left, box_right);
-
-        BvhNode {
-            left: _left,
-            right: _right,
-            bb: _bb,
-        }
-    }
-
-    fn sort(a: Box<Hitable>, b: Box<Hitable>, axis: i32) -> Option<Ordering> {
-        let box_left = a.bounding_box(0.0, 0.0);
-        let box_right = b.bounding_box(0.0, 0.0);
-
-        if box_left.is_none() || box_right.is_none() {
-            panic!("No bounding box in the constructor!");
-        }
-
-        return if axis == 0 {
-            box_left
-                .unwrap()
-                .min()
-                .x()
-                .partial_cmp(&box_right.unwrap().min().x())
-        } else if axis == 1 {
-            box_left
-                .unwrap()
-                .min()
-                .y()
-                .partial_cmp(&box_right.unwrap().min().y())
-        } else {
-            box_left
-                .unwrap()
-                .min()
-                .z()
-                .partial_cmp(&box_right.unwrap().min().z())
-        };
-    }
+#[derive(Copy, Clone, Debug)]
+pub struct NodeId {
+  index: usize
 }
+
+impl<'a> BvhTree<'a> {
+  fn hit(&self, id: NodeId, r: &Ray, tmin: f32, tmax: f32) -> Option<HitRecord> {
+    let node = &self.nodes[id.index];
+
+    if node.aabb.is_none() || node.aabb.is_some() && node.aabb.unwrap().hit(r, tmin, tmax) {
+      match node.hitable {
+        Some(ref hitable) => return hitable.hit(r, tmin, tmax),
+        None => { }
+      }
+
+      let mut hit_left: Option<HitRecord> = None;
+      let mut hit_right: Option<HitRecord> = None;
+
+      if let Some(ref left_index) = node.left {
+        hit_left = self.hit(*left_index, r, tmin, tmax);
+      }
+
+      if let Some(ref right_index) = node.right {
+        hit_right = self.hit(*right_index, r, tmin, tmax);
+      }
+
+      match hit_left {
+        Some(left) => {
+          match hit_right {
+            Some(right) => if left.t < right.t { return hit_left; } else { return hit_right; },
+            None => return hit_left
+          }
+        },
+        None => {}
+      }
+
+      match hit_right {
+        Some(_right) => return hit_right,
+        None => {}
+      }
+    }
+
+    None
+  }
+}
+
+impl<'a> Hitable for BvhTree<'a> {
+  fn bounding_box(&self) -> Option<AABB> {
+    self.nodes[self.root.index].aabb
+  }
+
+  fn hit(&self, r: &Ray, tmin: f32, tmax: f32) -> Option<HitRecord> {
+    self.hit(self.root, r, tmin, tmax)
+  }
+}
+
+impl<'a> BvhTree<'a> {
+  pub fn new(l: &'a mut [Box<Hitable>]) -> BvhTree<'a> {
+    let mut tree = BvhTree { nodes: Vec::new(), root: NodeId { index: 0 } };
+    tree.root = tree.build(l);
+
+    tree
+  }
+
+  fn build(&mut self, l: &'a mut [Box<Hitable>]) -> NodeId {
+    let axis = rand::thread_rng().gen_range::<i32>(0, 3);
+
+    match axis {
+      0 => l.sort_by(|a, b| box_x_compare(a, b)),
+      1 => l.sort_by(|a, b| box_y_compare(a, b)),
+      2 => l.sort_by(|a, b| box_z_compare(a, b)),
+      _ => panic!("Unexpected axis")
+    }
+
+    let left: NodeId;
+    let right: NodeId;
+
+    if l.len() == 1 {
+      return self.new_leaf(&l[0]);
+    } else if l.len() == 2 {
+      left = self.new_leaf(&l[0]);
+      right = self.new_leaf(&l[1]);
+    } else {
+      let half_len = l.len() / 2;
+      let (left_hitables, right_hitables) = l.split_at_mut(half_len);
+
+      left = self.build(left_hitables);
+      right = self.build(right_hitables);
+    }
+
+    if let Some(left_box) = self.nodes[left.index].aabb {
+      if let Some(right_box) = self.nodes[right.index].aabb {
+        return self.new_node(AABB::surrounding_box(&left_box, &right_box), Some(left), Some(right))
+      }
+    }
+
+    panic!("No bounding box in BvhNode::build");
+  }
+
+  fn new_leaf(&mut self, hitable: &'a Box<Hitable>) -> NodeId {
+    let next_index = self.nodes.len();
+
+    self.nodes.push(BvhNode {
+      left: None,
+      right: None,
+      aabb: hitable.bounding_box(),
+      hitable: Some(hitable)
+    });
+
+    return NodeId { index: next_index };
+  }
+
+  fn new_node(&mut self, aabb: AABB, left: Option<NodeId>, right: Option<NodeId>) -> NodeId {
+    let next_index = self.nodes.len();
+
+    self.nodes.push(BvhNode {
+      left,
+      right,
+      aabb: Some(aabb),
+      hitable: None
+    });
+
+    return NodeId { index: next_index };
+  }
+
+  fn number_hittables(&self, id: NodeId) -> usize {
+    let node = &self.nodes[id.index];
+    let local_hitable = if node.hitable.is_some() { 1 } else { 0 };
+    let count_left = if let Some(left_index) = node.left { self.number_hittables(left_index) } else { 0 };
+    let count_right = if let Some(right_index) = node.right { self.number_hittables(right_index) } else { 0 };
+
+    local_hitable + count_left + count_right
+  }
+}
+
+impl<'a> fmt::Display for BvhTree<'a> {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "BVH with {:?} hitables and {:?} nodes", self.number_hittables(self.root), self.nodes.len())
+  }
+}
+
+fn box_x_compare(a: &Box<Hitable>, b: &Box<Hitable>) -> Ordering {
+  if let Some(box_left) = a.bounding_box() {
+    if let Some(box_right) = b.bounding_box() {
+      if let Some(cmp) = box_left.min().x().partial_cmp(&box_right.min().x()) {
+        return cmp;
+      } else {
+        panic!("Can't compare");
+      }
+    }
+  }
+
+  panic!("No bounding box in BvhNode::new");
+}
+
+fn box_y_compare(a: &Box<Hitable>, b: &Box<Hitable>) -> Ordering {
+  if let Some(box_left) = a.bounding_box() {
+    if let Some(box_right) = b.bounding_box() {
+      if let Some(cmp) = box_left.min().y().partial_cmp(&box_right.min().y()) {
+        return cmp;
+      } else {
+        panic!("Can't compare");
+      }
+    }
+  }
+
+  panic!("No bounding box in BvhNode::new");
+}
+
+fn box_z_compare(a: &Box<Hitable>, b: &Box<Hitable>) -> Ordering {
+  if let Some(box_left) = a.bounding_box() {
+    if let Some(box_right) = b.bounding_box() {
+      if let Some(cmp) = box_left.min().z().partial_cmp(&box_right.min().z()) {
+        return cmp;
+      } else {
+        panic!("Can't compare");
+      }
+    }
+  }
+
+  panic!("No bounding box in BvhNode::new");
+}
+

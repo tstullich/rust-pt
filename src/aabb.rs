@@ -1,7 +1,7 @@
 use ray::Ray;
 use vector::Vec3;
 
-#[derive(Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct AABB {
     min: Vec3,
     max: Vec3,
@@ -45,7 +45,7 @@ impl AABB {
         true
     }
 
-    pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
+    pub fn surrounding_box(box0: &AABB, box1: &AABB) -> AABB {
         let small = Vec3::new(
             box0.min().x().min(box1.min().x()),
             box0.min().y().min(box1.min().y()),

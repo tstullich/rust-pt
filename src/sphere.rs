@@ -46,7 +46,7 @@ impl Hitable for Sphere {
         None
     }
 
-    fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<AABB> {
         Some(AABB::new(
             self.position - Vec3::new(self.radius, self.radius, self.radius),
             self.position + Vec3::new(self.radius, self.radius, self.radius),
@@ -105,7 +105,7 @@ impl Hitable for MovingSphere {
         None
     }
 
-    fn bounding_box(&self, t0: f32, t1: f32) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<AABB> {
         None
     }
 }
