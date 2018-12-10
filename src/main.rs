@@ -77,6 +77,12 @@ fn main() {
         .parse::<u32>()
         .unwrap();
 
+    let samples = matches
+        .value_of("samples")
+        .unwrap_or("32")
+        .parse::<u32>()
+        .unwrap();
+
     let world = if matches.value_of("file").is_some() {
         // Create our scene and add some geometry
         Parser::OBJ(String::from(matches.value_of("file").unwrap())).parse()
@@ -102,7 +108,7 @@ fn main() {
     );
 
     let renderer = renderer::Renderer::new(cam);
-    let pixels = renderer.render(width, height, &world);
+    let pixels = renderer.render(width, height, samples, &world);
 
     let path = std::path::Path::new("test.png");
     let file = std::fs::File::create(path).unwrap();

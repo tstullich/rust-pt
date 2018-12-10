@@ -24,10 +24,9 @@ impl Renderer {
         Renderer { camera }
     }
 
-    pub fn render(&self, dim_x: u32, dim_y: u32, world: &HitableList) -> Vec<u8> {
+    pub fn render(&self, dim_x: u32, dim_y: u32, num_samples: u32, world: &HitableList) -> Vec<u8> {
         // Options pertaining to the actual path tracing
         let depth: u32 = 0;
-        let num_samples: u16 = 16;
         let progress_bar = &Box::new(ProgressBar::new(dim_x as u64 * dim_y as u64));
         progress_bar.set_message("Rendered Pixels");
         progress_bar.set_style(
