@@ -1,5 +1,5 @@
 [package]
-name = "pathtracer"
+name = "raytracer"
 version = "0.1.0"
 authors = ["Tim Stullich <tstullich@protonmail.com>"]
 

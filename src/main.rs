@@ -60,7 +60,7 @@ fn main() {
                 .short("s")
                 .long("samples")
                 .value_name("SAMPLES")
-                .help("The number of samples that will be taken for antialiasing")
+                .help("The number of samples that will be taken per pixel")
                 .takes_value(true),
         )
         .get_matches();
