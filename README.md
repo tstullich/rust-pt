@@ -6,6 +6,19 @@ This project is based on a tutorial called [Ray Tracing In One Weekend](https://
 I decided to port the code to Rust since I wanted to learn the language and do it through a fun project. The code isn't perfect yet, but
 I am hoping to iterate over it from time-to-time and build out some more features and fix bugs.
 
-# Examples
+## Examples
 Below I am going to post some example pictures. These are some of many configurable scenes.
 ![Example Scene 1](https://i.imgur.com/hWEy03x.png)
+
+## Features
+- [x] OBJ model parsing or randomized scene creation
+- [x] Support for configurable dielectric, diffuse, and caustic materials
+- [x] Motion blur
+- [x] Checkered textures support
+- [x] Configuring of rendering parameters through command line arguments
+- [x] Multithreaded rendering through the use of Rust’s rayon library
+
+## Future Work
+- [ ] Bounding Volume Hierarchy
+- [ ] Microfacet materials
+- [ ] Volumes
